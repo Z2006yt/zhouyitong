@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pulse · SVG 图标底导航</title>
+<script src="font/iconfont.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ===== zyt 设计 token — 「Pulse」心动社交 ===== */
+  :root {
+    --zyt-bg: #F2F1EE;        /* 暖白 */
+    --zyt-ink: #16181D;       /* 墨 */
+    --zyt-muted: #9BA1AB;     /* 灰 */
+    --zyt-line: #E3E1DC;      /* 边线 */
+    --zyt-card: #FFFFFF;
+    --zyt-accent: #FF3B5C;    /* 心动红 */
+    --zyt-accent-deep: #D92446;
+    --zyt-badge: #FF3B5C;
+    --zyt-grotesk: 'Space Grotesk', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    --zyt-sans: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    --zyt_device_w: 390px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--zyt-sans);
+    background-color: var(--zyt-bg);
+    color: var(--zyt-ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* 背景描边大字 */
+  .zyt_watermark {
+    position: fixed;
+    bottom: -4vmin;
+    right: -2vmin;
+    font-family: var(--zyt-grotesk);
+    font-weight: 700;
+    font-size: 24vmin;
+    letter-spacing: -0.04em;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(22, 24, 29, 0.06);
+    pointer-events: none;
+    user-select: none;
+    z-index: 0;
+    line-height: 0.9;
+  }
+
+  .zyt_page {
+    position: relative;
+    z-index: 1;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 2rem 5rem;
+  }
+
+  /* —— 顶部导航 —— */
+  .zyt_topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--zyt-line);
+  }
+  .zyt_back {
+    font-size: 0.85rem;
+    color: var(--zyt-muted);
+    text-decoration: none;
+    letter-spacing: 0.04em;
+    transition: color 0.2s;
+  }
+  .zyt_back:hover { color: var(--zyt-accent); }
+  .zyt_switch {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.9rem;
+    border: 1px solid var(--zyt-line);
+    color: var(--zyt-ink);
+    text-decoration: none;
+    letter-spacing: 0.06em;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .zyt_switch:hover { border-color: var(--zyt-accent); color: var(--zyt-accent); }
+
+  /* —— 头部 —— */
+  .zyt_header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2rem;
+    padding: 3.5rem 0 2.5rem;
+    flex-wrap: wrap;
+  }
+  .zyt_brand {
+    font-family: var(--zyt-grotesk);
+    font-size: clamp(2.6rem, 5vw, 4.2rem);
+    font-weight: 700;
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+  }
+  .zyt_brand .zyt_pulse_dot {
+    display: inline-block;
+    width: 0.32em;
+    height: 0.32em;
+    background: var(--zyt-accent);
+    border-radius: 50%;
+    margin-left: 0.06em;
+    animation: zyt_beat 1.6s ease-in-out infinite;
+  }
+  @keyframes zyt_beat {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 0.55; }
+  }
+  .zyt_brand_sub {
+    font-size: 0.95rem;
+    color: var(--zyt-muted);
+    margin-top: 0.9rem;
+    letter-spacing: 0.02em;
+  }
+  .zyt_header_note {
+    max-width: 300px;
+    font-size: 0.88rem;
+    line-height: 1.8;
+    color: var(--zyt-muted);
+    border-left: 2px solid var(--zyt-accent);
+    padding-left: 1.1rem;
+  }
+  .zyt_header_note code {
+    font-family: var(--zyt-grotesk);
+    color: var(--zyt-accent-deep);
+    font-size: 0.82rem;
+  }
+
+  /* —— 控制器 —— */
+  .zyt_controls {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+  }
+  .zyt_control_label {
+    font-size: 0.75rem;
+    letter-spacing: 0.18em;
+    color: var(--zyt-muted);
+  }
+  .zyt_seg {
+    display: flex;
+    border: 1px solid var(--zyt-line);
+    background: var(--zyt-card);
+  }
+  .zyt_seg_btn {
+    font-family: var(--zyt-grotesk);
+    font-size: 0.78rem;
+    padding: 0.55rem 1.1rem;
+    background: transparent;
+    border: none;
+    color: var(--zyt-muted);
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: all 0.2s;
+  }
+  .zyt_seg_btn + .zyt_seg_btn { border-left: 1px solid var(--zyt-line); }
+  .zyt_seg_btn.zyt_active { background: var(--zyt-ink); color: #fff; }
+  .zyt_reset {
+    font-family: var(--zyt-grotesk);
+    font-size: 0.78rem;
+    background: none;
+    border: none;
+    color: var(--zyt-accent-deep);
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    border-bottom: 1px solid transparent;
+    padding: 0;
+    transition: border-color 0.2s;
+  }
+  .zyt_reset:hover { border-color: var(--zyt-accent-deep); }
+
+  /* ===== 手机模型 ===== */
+  .zyt_stage {
+    display: flex;
+    justify-content: center;
+  }
+  .zyt_phone {
+    width: min(var(--zyt_device_w), 92vw);
+    height: min(760px, 84vh);
+    min-height: 560px;
+    background: #101114;
+    border-radius: 46px;
+    padding: 12px;
+    box-shadow:
+      0 0 0 1px rgba(22,24,29,0.06),
+      0 40px 90px rgba(22,24,29,0.22),
+      0 12px 30px rgba(22,24,29,0.12);
+    transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    position: relative;
+  }
+  .zyt_screen {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: #FBFBFC;
+    border-radius: 36px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .zyt_notch {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 34%;
+    height: 24px;
+    background: #101114;
+    border-radius: 14px;
+    z-index: 30;
+  }
+
+  /* 状态栏 */
+  .zyt_statusbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 26px 6px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--zyt-ink);
+    flex-shrink: 0;
+    z-index: 20;
+  }
+  .zyt_status_icons { display: flex; align-items: center; gap: 5px; }
+  .zyt_sig { display: flex; align-items: flex-end; gap: 1.5px; height: 10px; }
+  .zyt_sig i { width: 2.5px; background: var(--zyt-ink); border-radius: 1px; display: block; }
+  .zyt_sig i:nth-child(1) { height: 3px; }
+  .zyt_sig i:nth-child(2) { height: 5px; }
+  .zyt_sig i:nth-child(3) { height: 7px; }
+  .zyt_sig i:nth-child(4) { height: 9px; }
+  .zyt_batt {
+    width: 20px; height: 10px;
+    border: 1.5px solid var(--zyt-ink);
+    border-radius: 3px;
+    position: relative;
+  }
+  .zyt_batt::before {
+    content: '';
+    position: absolute;
+    inset: 1.5px;
+    right: 30%;
+    background: var(--zyt-ink);
+    border-radius: 1px;
+  }
+
+  /* App 头部 */
+  .zyt_appbar {
+    padding: 10px 22px 14px;
+    flex-shrink: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .zyt_appbar_title {
+    font-family: var(--zyt-grotesk);
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .zyt_appbar_sub {
+    font-size: 0.72rem;
+    color: var(--zyt-muted);
+    letter-spacing: 0.14em;
+    margin-top: 2px;
+  }
+  .zyt_avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--zyt-accent), #FF8FA3);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--zyt-grotesk);
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+
+  /* 内容流 */
+  .zyt_feed {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 18px 24px;
+    scrollbar-width: none;
+  }
+  .zyt_feed::-webkit-scrollbar { display: none; }
+
+  .zyt_section_title {
+    font-family: var(--zyt-grotesk);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.24em;
+    color: var(--zyt-muted);
+    margin: 18px 4px 12px;
+  }
+
+  .zyt_post {
+    background: var(--zyt-card);
+    border: 1px solid rgba(22,24,29,0.06);
+    border-radius: 18px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .zyt_post_head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .zyt_post_avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 600;
+    font-family: var(--zyt-grotesk);
+  }
+  .zyt_post_name { font-size: 0.88rem; font-weight: 600; }
+  .zyt_post_time { font-size: 0.7rem; color: var(--zyt-muted); }
+  .zyt_post_img {
+    height: 120px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--zyt-grotesk);
+    font-size: 2rem;
+    color: rgba(255,255,255,0.85);
+    font-weight: 700;
+  }
+  .zyt_post_acts {
+    display: flex;
+    gap: 18px;
+  }
+  .zyt_act_btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    padding: 2px;
+    cursor: pointer;
+    color: #B7BCC4;
+    font-size: 0.76rem;
+    font-family: var(--zyt-grotesk);
+    font-weight: 500;
+    transition: color 0.2s, transform 0.15s;
+  }
+  .zyt_act_btn:active { transform: scale(1.12); }
+  .zyt_act_btn.zyt_on { color: var(--zyt-accent); }
+  .zyt_svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+    display: block;
+  }
+
+  /* ===== 底部固定导航（核心组件） ===== */
+  .zyt_tabbar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-top: 1px solid rgba(22,24,29,0.07);
+    padding: 8px 6px calc(10px + env(safe-area-inset-bottom, 0px));
+    z-index: 25;
+  }
+  .zyt_tab {
+    flex: 1 1 0;          /* 自适应均分宽度 */
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 0 2px;
+    color: #B7BCC4;
+    transition: color 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .zyt_tab.zyt_active { color: var(--zyt-ink); }
+  .zyt_tab.zyt_active .zyt_tab_label { color: var(--zyt-accent-deep); font-weight: 600; }
+
+  .zyt_tab_iconwrap {
+    position: relative;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .zyt_tab_svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+    display: block;
+  }
+  .zyt_tab.zyt_active .zyt_tab_iconwrap {
+    animation: zyt_pop 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes zyt_pop {
+    0% { transform: scale(0.82); }
+    100% { transform: scale(1); }
+  }
+
+  .zyt_tab_label {
+    font-size: 0.66rem;
+    letter-spacing: 0.08em;
+    color: inherit;
+  }
+
+  /* 数字徽章 */
+  .zyt_badge {
+    position: absolute;
+    top: -5px;
+    left: calc(50% + 6px);
+    min-width: 17px;
+    height: 17px;
+    padding: 0 4.5px;
+    background: var(--zyt-badge);
+    color: #fff;
+    font-size: 0.6rem;
+    font-weight: 600;
+    font-family: var(--zyt-grotesk);
+    line-height: 17px;
+    text-align: center;
+    border-radius: 9px;
+    border: 1.5px solid #fff;
+    box-shadow: 0 2px 8px rgba(255, 59, 92, 0.45);
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  /* 红点（带呼吸） */
+  .zyt_dot {
+    position: absolute;
+    top: -2px;
+    left: calc(50% + 8px);
+    width: 9px;
+    height: 9px;
+    background: var(--zyt-badge);
+    border-radius: 50%;
+    border: 1.5px solid #fff;
+    box-shadow: 0 0 0 0 rgba(255, 59, 92, 0.4);
+    animation: zyt_dotpulse 2s ease-out infinite;
+    transition: transform 0.25s, opacity 0.2s;
+    pointer-events: none;
+  }
+  @keyframes zyt_dotpulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 59, 92, 0.45); }
+    70% { box-shadow: 0 0 0 6px rgba(255, 59, 92, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 59, 92, 0); }
+  }
+  .zyt_badge.zyt_hide, .zyt_dot.zyt_hide {
+    transform: scale(0);
+    opacity: 0;
+    animation: none;
+  }
+
+  .zyt_homebar {
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 32%;
+    height: 4px;
+    background: rgba(22,24,29,0.22);
+    border-radius: 2px;
+    z-index: 26;
+    pointer-events: none;
+  }
+
+  /* —— 页脚 —— */
+  .zyt_footer {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--zyt-line);
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--zyt-muted);
+    letter-spacing: 0.1em;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  @media (max-width: 640px) {
+    .zyt_page { padding: 0 1rem 3rem; }
+    .zyt_header { padding: 2rem 0 1.5rem; }
+    .zyt_phone { padding: 8px; border-radius: 38px; }
+    .zyt_screen { border-radius: 30px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="zyt_watermark">Pulse</div>
+
+<div class="zyt_page">
+
+  <nav class="zyt_topbar">
+    <a href="index.html" class="zyt_back">← 返回首页</a>
+    <a href="iconfont-3.html" class="zyt_switch">← 字体图标版</a>
+  </nav>
+
+  <header class="zyt_header">
+    <div>
+      <h1 class="zyt_brand">Pulse<span class="zyt_pulse_dot"></span></h1>
+      <p class="zyt_brand_sub">心动社交 — 移动端底导航 · SVG Symbol 实现</p>
+    </div>
+    <p class="zyt_header_note">
+      图标经 <code>iconfont.js</code> 以 SVG 雪碧图注入，&lt;use&gt; 引用 symbol，颜色由 <code>currentColor</code> 级联控制；红点带呼吸扩散动效。
+    </p>
+  </header>
+
+  <div class="zyt_controls">
+    <span class="zyt_control_label">设备宽度 · 导航自适应</span>
+    <div class="zyt_seg" id="zyt_seg">
+      <button class="zyt_seg_btn" data-w="340px">紧凑 340</button>
+      <button class="zyt_seg_btn zyt_active" data-w="390px">标准 390</button>
+      <button class="zyt_seg_btn" data-w="440px">宽屏 440</button>
+    </div>
+    <button class="zyt_reset" id="zyt_reset">重置徽章</button>
+  </div>
+
+  <div class="zyt_stage">
+    <div class="zyt_phone" id="zyt_phone">
+      <div class="zyt_screen">
+        <div class="zyt_notch"></div>
+
+        <!-- 状态栏 -->
+        <div class="zyt_statusbar">
+          <span>9:41</span>
+          <div class="zyt_status_icons">
+            <span class="zyt_sig"><i></i><i></i><i></i><i></i></span>
+            <span class="zyt_batt"></span>
+          </div>
+        </div>
+
+        <!-- App 头部 -->
+        <div class="zyt_appbar">
+          <div>
+            <div class="zyt_appbar_title" id="zyt_appbar_title">发现</div>
+            <div class="zyt_appbar_sub" id="zyt_appbar_sub">NEARBY · 2KM 内心动</div>
+          </div>
+          <div class="zyt_avatar">Zy</div>
+        </div>
+
+        <!-- 内容 -->
+        <div class="zyt_feed" id="zyt_feed">
+          <p class="zyt_section_title">为你推荐</p>
+          <!-- JS 生成动态卡片 -->
+        </div>
+
+        <!-- 底部固定导航 -->
+        <nav class="zyt_tabbar" id="zyt_tabbar"><!-- JS 生成 --></nav>
+        <div class="zyt_homebar"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="zyt_footer">
+    <span>ICONFONT · SVG-SYMBOL 方案</span>
+    <span>PULSE © 2026</span>
+  </footer>
+
+</div>
+
+<script>
+/* ===== zyt 数据 ===== */
+var zyt_tabs = [
+  { key: 'home', label: '首页', symbol: 'icon-shouye1',        symbolOn: 'icon-shouye1',        badge: null,  title: '发现', sub: 'NEARBY · 2KM 内心动' },
+  { key: 'like', label: '喜欢', symbol: 'icon-xihuan2',        symbolOn: 'icon-xihuan2-copy',   badge: '12',  title: '喜欢', sub: 'WHO LIKES YOU' },
+  { key: 'fav',  label: '收藏', symbol: 'icon-shoucang2',      symbolOn: 'icon-shoucang2-copy', badge: '5',   title: '收藏', sub: 'SAVED MOMENTS' },
+  { key: 'mine', label: '我的', symbol: 'icon-wode',           symbolOn: 'icon-wode',           badge: 'dot', title: '我的', sub: 'PROFILE & SETTINGS' }
+];
+
+var zyt_posts = [
+  { name: '林小满', time: '8 分钟前', tag: '美术馆', hue: '#FF6B8A', likes: 128, stars: 32 },
+  { name: 'Kiko',   time: '26 分钟前', tag: '黑胶店', hue: '#4C6FFF', likes: 96,  stars: 21 },
+  { name: '阿澈',   time: '1 小时前',  tag: 'livehouse', hue: '#8C5CF0', likes: 214, stars: 57 },
+  { name: '桃桃子', time: '3 小时前',  tag: '咖啡馆', hue: '#12B5A5', likes: 74,  stars: 18 }
+];
+
+/* ===== zyt 状态 ===== */
+var zyt_active = 'home';
+
+/* ===== zyt 渲染底导航 ===== */
+var zyt_tabbar = document.getElementById('zyt_tabbar');
+
+function zyt_svgUse(zyt_id, zyt_cls) {
+  return '<svg class="' + zyt_cls + '" aria-hidden="true"><use href="#' + zyt_id + '"></use></svg>';
+}
+
+function zyt_renderTabbar() {
+  zyt_tabbar.innerHTML = '';
+  zyt_tabs.forEach(function(zyt_t) {
+    var zyt_btn = document.createElement('button');
+    zyt_btn.className = 'zyt_tab' + (zyt_t.key === zyt_active ? ' zyt_active' : '');
+    zyt_btn.dataset.key = zyt_t.key;
+
+    var zyt_badgeHtml = '';
+    if (zyt_t.badge === 'dot') {
+      zyt_badgeHtml = '<span class="zyt_dot" data-badge="' + zyt_t.key + '"></span>';
+    } else if (zyt_t.badge) {
+      zyt_badgeHtml = '<span class="zyt_badge" data-badge="' + zyt_t.key + '">' + zyt_t.badge + '</span>';
+    }
+
+    zyt_btn.innerHTML =
+      '<span class="zyt_tab_iconwrap">' +
+        zyt_svgUse(zyt_t.key === zyt_active ? zyt_t.symbolOn : zyt_t.symbol, 'zyt_tab_svg') +
+        zyt_badgeHtml +
+      '</span>' +
+      '<span class="zyt_tab_label">' + zyt_t.label + '</span>';
+
+    zyt_btn.addEventListener('click', function() { zyt_selectTab(zyt_t.key); });
+    zyt_tabbar.appendChild(zyt_btn);
+  });
+}
+
+function zyt_selectTab(zyt_key) {
+  zyt_active = zyt_key;
+  var zyt_t = zyt_tabs.find(function(x) { return x.key === zyt_key; });
+  document.getElementById('zyt_appbar_title').textContent = zyt_t.title;
+  document.getElementById('zyt_appbar_sub').textContent = zyt_t.sub;
+  var zyt_b = document.querySelector('[data-badge="' + zyt_key + '"]');
+  if (zyt_b) {
+    zyt_b.classList.add('zyt_hide');
+    setTimeout(function() { if (zyt_b.parentNode) zyt_b.parentNode.removeChild(zyt_b); }, 260);
+    zyt_t.badge = null;
+  }
+  zyt_renderTabbar();
+}
+
+/* ===== zyt 渲染动态卡片 ===== */
+var zyt_feed = document.getElementById('zyt_feed');
+
+zyt_posts.forEach(function(zyt_p) {
+  var zyt_card = document.createElement('div');
+  zyt_card.className = 'zyt_post';
+  zyt_card.innerHTML =
+    '<div class="zyt_post_head">' +
+      '<div class="zyt_post_avatar" style="background:' + zyt_p.hue + '">' + zyt_p.name.charAt(0) + '</div>' +
+      '<div><div class="zyt_post_name">' + zyt_p.name + '</div>' +
+      '<div class="zyt_post_time">' + zyt_p.time + '</div></div>' +
+    '</div>' +
+    '<div class="zyt_post_img" style="background:linear-gradient(120deg,' + zyt_p.hue + ',' + zyt_p.hue + 'CC)">' + zyt_p.tag + '</div>' +
+    '<div class="zyt_post_acts">' +
+      '<button class="zyt_act_btn" data-act="like">' + zyt_svgUse('icon-xihuan2', 'zyt_svg') + '<span>' + zyt_p.likes + '</span></button>' +
+      '<button class="zyt_act_btn" data-act="fav">' + zyt_svgUse('icon-shoucang2', 'zyt_svg') + '<span>' + zyt_p.stars + '</span></button>' +
+    '</div>';
+  zyt_feed.appendChild(zyt_card);
+});
+
+/* 卡片内喜欢/收藏切换：换 symbol + 计数 */
+zyt_feed.addEventListener('click', function(zyt_e) {
+  var zyt_btn = zyt_e.target.closest('.zyt_act_btn');
+  if (!zyt_btn) return;
+  var zyt_on = zyt_btn.classList.toggle('zyt_on');
+  var zyt_use = zyt_btn.querySelector('use');
+  var zyt_num = zyt_btn.querySelector('span');
+  var zyt_n = parseInt(zyt_num.textContent, 10);
+  if (zyt_btn.dataset.act === 'like') {
+    zyt_use.setAttribute('href', zyt_on ? '#icon-xihuan2-copy' : '#icon-xihuan2');
+  } else {
+    zyt_use.setAttribute('href', zyt_on ? '#icon-shoucang2-copy' : '#icon-shoucang2');
+  }
+  zyt_num.textContent = zyt_on ? zyt_n + 1 : zyt_n - 1;
+});
+
+/* ===== zyt 设备宽度切换 ===== */
+document.getElementById('zyt_seg').addEventListener('click', function(zyt_e) {
+  var zyt_btn = zyt_e.target.closest('.zyt_seg_btn');
+  if (!zyt_btn) return;
+  document.querySelectorAll('.zyt_seg_btn').forEach(function(b) { b.classList.remove('zyt_active'); });
+  zyt_btn.classList.add('zyt_active');
+  document.documentElement.style.setProperty('--zyt_device_w', zyt_btn.dataset.w);
+});
+
+/* ===== zyt 重置徽章 ===== */
+var zyt_badgeDefaults = { like: '12', fav: '5', mine: 'dot' };
+document.getElementById('zyt_reset').addEventListener('click', function() {
+  zyt_tabs.forEach(function(t) { t.badge = zyt_badgeDefaults[t.key] || null; });
+  zyt_renderTabbar();
+});
+
+/* ===== 雪碧图注入后：剥离硬编码灰色填充，让 currentColor 生效 ===== */
+document.addEventListener('DOMContentLoaded', function() {
+  ['icon-xihuan2'].forEach(function(zyt_id) {
+    var zyt_path = document.querySelector('#' + zyt_id + ' path');
+    if (zyt_path) zyt_path.removeAttribute('fill');
+  });
+});
+
+/* ===== 启动 ===== */
+zyt_renderTabbar();
+</script>
+</body>
+</html>

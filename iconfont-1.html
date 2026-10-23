@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>陈列室 · Font Awesome 字体图标</title>
+<link rel="stylesheet" href="cdn/fontawesome/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,800;1,400&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ===== zyt 设计 token — 收藏陈列室 ===== */
+  :root {
+    --zyt-bg: #EDE6D6;       /* 纸白 */
+    --zyt-ink: #1A1410;      /* 深棕黑 */
+    --zyt-muted: #8C7B6B;    /* 灰棕 */
+    --zyt-border: #D4C9B5;   /* 纸边 */
+    --zyt-card: #F6F1E4;     /* 卡片 */
+    --zyt-accent: #8B4513;   /* 马鞍棕 */
+    --zyt-accent-soft: #C49A6C;
+    --zyt-serif: 'Playfair Display', Georgia, serif;
+    --zyt-sans: 'Inter', -apple-system, sans-serif;
+    --zyt-grotesk: 'Space Grotesk', 'Inter', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--zyt-sans);
+    background-color: var(--zyt-bg);
+    color: var(--zyt-ink);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .zyt_container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  /* —— 顶部导航 —— */
+  .zyt_topbar {
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--zyt-border);
+    margin-bottom: 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .zyt_topbar_left {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+  .zyt_back {
+    font-family: var(--zyt-grotesk);
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--zyt-muted);
+    text-decoration: none;
+    letter-spacing: 0.03em;
+    transition: color 0.2s;
+  }
+  .zyt_back:hover { color: var(--zyt-accent); }
+  .zyt_back .fa-arrow-left { margin-right: 0.4rem; font-size: 0.75rem; }
+  .zyt_crumb {
+    font-size: 0.8rem;
+    color: var(--zyt-muted);
+    font-family: var(--zyt-grotesk);
+  }
+  .zyt_nav_links {
+    display: flex;
+    gap: 1rem;
+  }
+  .zyt_nav_links a {
+    font-family: var(--zyt-grotesk);
+    font-size: 0.8rem;
+    padding: 0.4rem 0.9rem;
+    border: 1px solid var(--zyt-border);
+    color: var(--zyt-ink);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: all 0.2s;
+  }
+  .zyt_nav_links a:hover {
+    border-color: var(--zyt-accent);
+    color: var(--zyt-accent);
+  }
+
+  /* —— 头部 —— */
+  .zyt_header {
+    margin-bottom: 2.5rem;
+  }
+  .zyt_eyebrow {
+    font-family: var(--zyt-grotesk);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    color: var(--zyt-muted);
+    margin-bottom: 1rem;
+  }
+  .zyt_title {
+    font-family: var(--zyt-serif);
+    font-size: clamp(2.25rem, 5vw, 3.75rem);
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -0.015em;
+    margin-bottom: 1rem;
+  }
+  .zyt_intro {
+    font-size: 1rem;
+    color: var(--zyt-muted);
+    max-width: 560px;
+  }
+  .zyt_intro em {
+    font-family: var(--zyt-serif);
+    font-style: italic;
+    color: var(--zyt-accent);
+  }
+
+  /* —— 筛选栏 —— */
+  .zyt_filters {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--zyt-border);
+    flex-wrap: wrap;
+  }
+  .zyt_filter_btn {
+    font-family: var(--zyt-grotesk);
+    font-size: 0.78rem;
+    font-weight: 500;
+    padding: 0.45rem 1rem;
+    background: transparent;
+    border: 1px solid var(--zyt-border);
+    color: var(--zyt-muted);
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: all 0.2s;
+  }
+  .zyt_filter_btn:hover { color: var(--zyt-ink); }
+  .zyt_filter_btn.zyt_active {
+    background: var(--zyt-ink);
+    border-color: var(--zyt-ink);
+    color: var(--zyt-bg);
+  }
+
+  /* —— 图标网格 —— */
+  .zyt_grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1px;
+    background: var(--zyt-border);
+    border: 1px solid var(--zyt-border);
+    margin-bottom: 3rem;
+  }
+  .zyt_icon_card {
+    background: var(--zyt-card);
+    padding: 1.75rem 1rem 1.25rem;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.25s ease, color 0.25s ease;
+    position: relative;
+    user-select: none;
+  }
+  .zyt_icon_card:hover {
+    background: var(--zyt-ink);
+    color: var(--zyt-bg);
+  }
+  .zyt_icon_card:hover .zyt_icon_name { color: var(--zyt-bg); }
+  .zyt_icon_card:hover .zyt_icon_class { color: var(--zyt-accent-soft); }
+  .zyt_icon_card:hover .zyt_copy_hint { opacity: 1; }
+
+  .zyt_icon_display {
+    font-size: 2.25rem;
+    line-height: 1;
+    margin-bottom: 0.85rem;
+    color: var(--zyt-ink);
+    transition: color 0.25s ease;
+  }
+  .zyt_icon_card:hover .zyt_icon_display { color: var(--zyt-bg); }
+
+  .zyt_icon_name {
+    font-family: var(--zyt-serif);
+    font-size: 0.92rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: var(--zyt-ink);
+    transition: color 0.25s ease;
+  }
+  .zyt_icon_class {
+    font-family: var(--zyt-grotesk);
+    font-size: 0.68rem;
+    color: var(--zyt-muted);
+    letter-spacing: 0.02em;
+    word-break: break-all;
+    transition: color 0.25s ease;
+  }
+  .zyt_copy_hint {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    font-family: var(--zyt-grotesk);
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    color: var(--zyt-accent-soft);
+  }
+
+  /* —— 提示条 —— */
+  .zyt_toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--zyt-ink);
+    color: var(--zyt-bg);
+    font-family: var(--zyt-grotesk);
+    font-size: 0.8rem;
+    padding: 0.75rem 1.5rem;
+    letter-spacing: 0.04em;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s, transform 0.3s;
+    z-index: 100;
+  }
+  .zyt_toast.zyt_show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* —— 页脚 —— */
+  .zyt_footer {
+    text-align: center;
+    padding: 2.5rem 0;
+    border-top: 1px solid var(--zyt-border);
+    font-size: 0.8rem;
+    color: var(--zyt-muted);
+    font-family: var(--zyt-grotesk);
+    letter-spacing: 0.05em;
+  }
+
+  @media (max-width: 600px) {
+    .zyt_container { padding: 0 1rem; }
+    .zyt_topbar { flex-direction: column; align-items: flex-start; gap: 1rem; }
+    .zyt_grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+    .zyt_icon_display { font-size: 1.85rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="zyt_container">
+
+  <!-- 顶部导航 -->
+  <nav class="zyt_topbar">
+    <div class="zyt_topbar_left">
+      <a href="index.html" class="zyt_back"><i class="fa-solid fa-arrow-left"></i> 返回首页</a>
+      <span class="zyt_crumb">/ I. Font Awesome</span>
+    </div>
+    <div class="zyt_nav_links">
+      <a href="iconfont-2.html">Lucide →</a>
+    </div>
+  </nav>
+
+  <!-- 头部 -->
+  <header class="zyt_header">
+    <p class="zyt_eyebrow">— THE COLLECTION —</p>
+    <h1 class="zyt_title">字体图标<br>的<em>黄金年代</em></h1>
+    <p class="zyt_intro">选取 Font Awesome 6 Free 中最具代表性的 <em>Solid</em>、<em>Regular</em> 与 <em>Brands</em> 三大家族。点击任一卡片即可复制对应的 CSS 类名。</p>
+  </header>
+
+  <!-- 筛选 -->
+  <div class="zyt_filters" id="zyt_filters">
+    <button class="zyt_filter_btn zyt_active" data-filter="all">全部</button>
+    <button class="zyt_filter_btn" data-filter="solid">Solid</button>
+    <button class="zyt_filter_btn" data-filter="regular">Regular</button>
+    <button class="zyt_filter_btn" data-filter="brands">Brands</button>
+  </div>
+
+  <!-- 图标网格 -->
+  <main class="zyt_grid" id="zyt_grid">
+    <!-- JS 生成 -->
+  </main>
+
+  <footer class="zyt_footer">
+    FONT AWESOME · VIA CDN · 本地部署
+  </footer>
+
+</div>
+
+<div class="zyt_toast" id="zyt_toast">已复制到剪贴板</div>
+
+<script>
+/* ===== zyt 图标数据 ===== */
+var zyt_icons = [
+  // Solid
+  { cls: 'fa-solid fa-palette', name: '调色板', set: 'solid' },
+  { cls: 'fa-solid fa-paintbrush', name: '画笔', set: 'solid' },
+  { cls: 'fa-solid fa-feather-pointed', name: '羽毛笔', set: 'solid' },
+  { cls: 'fa-solid fa-moon', name: '月亮', set: 'solid' },
+  { cls: 'fa-solid fa-sun', name: '太阳', set: 'solid' },
+  { cls: 'fa-solid fa-star', name: '星辰', set: 'solid' },
+  { cls: 'fa-solid fa-crown', name: '王冠', set: 'solid' },
+  { cls: 'fa-solid fa-gem', name: '宝石', set: 'solid' },
+  { cls: 'fa-solid fa-camera', name: '相机', set: 'solid' },
+  { cls: 'fa-solid fa-film', name: '胶片', set: 'solid' },
+  { cls: 'fa-solid fa-music', name: '乐谱', set: 'solid' },
+  { cls: 'fa-solid fa-book-open', name: '开卷', set: 'solid' },
+  { cls: 'fa-solid fa-scroll', name: '卷轴', set: 'solid' },
+  { cls: 'fa-solid fa-landmark', name: '地标', set: 'solid' },
+  { cls: 'fa-solid fa-mountain', name: '山峰', set: 'solid' },
+  { cls: 'fa-solid fa-fire', name: '火焰', set: 'solid' },
+  { cls: 'fa-solid fa-wine-glass', name: '酒杯', set: 'solid' },
+  { cls: 'fa-solid fa-mug-hot', name: '热饮', set: 'solid' },
+  { cls: 'fa-solid fa-leaf', name: '叶片', set: 'solid' },
+  { cls: 'fa-solid fa-seedling', name: '幼苗', set: 'solid' },
+  { cls: 'fa-solid fa-cloud', name: '云', set: 'solid' },
+  { cls: 'fa-solid fa-wind', name: '风', set: 'solid' },
+  { cls: 'fa-solid fa-droplet', name: '水滴', set: 'solid' },
+  { cls: 'fa-solid fa-bolt', name: '闪电', set: 'solid' },
+  { cls: 'fa-solid fa-atom', name: '原子', set: 'solid' },
+  { cls: 'fa-solid fa-flask', name: '烧瓶', set: 'solid' },
+  { cls: 'fa-solid fa-key', name: '钥匙', set: 'solid' },
+  { cls: 'fa-solid fa-lock', name: '锁', set: 'solid' },
+  { cls: 'fa-solid fa-heart', name: '心', set: 'solid' },
+  { cls: 'fa-solid fa-hand-holding-heart', name: '珍爱', set: 'solid' },
+  { cls: 'fa-solid fa-feather', name: '羽毛', set: 'solid' },
+  { cls: 'fa-solid fa-compass', name: '罗盘', set: 'solid' },
+
+  // Regular
+  { cls: 'fa-regular fa-heart', name: '心形', set: 'regular' },
+  { cls: 'fa-regular fa-star', name: '星', set: 'regular' },
+  { cls: 'fa-regular fa-bookmark', name: '书签', set: 'regular' },
+  { cls: 'fa-regular fa-circle', name: '圆', set: 'regular' },
+  { cls: 'fa-regular fa-square', name: '方', set: 'regular' },
+  { cls: 'fa-regular fa-comment', name: '对话', set: 'regular' },
+  { cls: 'fa-regular fa-envelope', name: '信封', set: 'regular' },
+  { cls: 'fa-regular fa-file', name: '文件', set: 'regular' },
+  { cls: 'fa-regular fa-image', name: '图像', set: 'regular' },
+  { cls: 'fa-regular fa-clock', name: '时钟', set: 'regular' },
+  { cls: 'fa-regular fa-calendar', name: '日历', set: 'regular' },
+  { cls: 'fa-regular fa-copy', name: '复制', set: 'regular' },
+
+  // Brands
+  { cls: 'fa-brands fa-github', name: 'GitHub', set: 'brands' },
+  { cls: 'fa-brands fa-twitter', name: 'X / Twitter', set: 'brands' },
+  { cls: 'fa-brands fa-instagram', name: 'Instagram', set: 'brands' },
+  { cls: 'fa-brands fa-linkedin', name: 'LinkedIn', set: 'brands' },
+  { cls: 'fa-brands fa-dribbble', name: 'Dribbble', set: 'brands' },
+  { cls: 'fa-brands fa-behance', name: 'Behance', set: 'brands' },
+  { cls: 'fa-brands fa-youtube', name: 'YouTube', set: 'brands' },
+  { cls: 'fa-brands fa-spotify', name: 'Spotify', set: 'brands' },
+  { cls: 'fa-brands fa-medium', name: 'Medium', set: 'brands' },
+  { cls: 'fa-brands fa-pinterest', name: 'Pinterest', set: 'brands' },
+  { cls: 'fa-brands fa-figma', name: 'Figma', set: 'brands' },
+  { cls: 'fa-brands fa-codepen', name: 'CodePen', set: 'brands' },
+  { cls: 'fa-brands fa-artstation', name: 'ArtStation', set: 'brands' }
+];
+
+/* ===== zyt 渲染 ===== */
+var zyt_grid = document.getElementById('zyt_grid');
+var zyt_currentFilter = 'all';
+
+function zyt_render() {
+  zyt_grid.innerHTML = '';
+  zyt_icons.forEach(function(zyt_icon) {
+    if (zyt_currentFilter !== 'all' && zyt_icon.set !== zyt_currentFilter) return;
+    var zyt_card = document.createElement('div');
+    zyt_card.className = 'zyt_icon_card';
+    zyt_card.dataset.cls = zyt_icon.cls;
+    zyt_card.innerHTML =
+      '<span class="zyt_copy_hint">COPY</span>' +
+      '<i class="' + zyt_icon.cls + ' zyt_icon_display"></i>' +
+      '<div class="zyt_icon_name">' + zyt_icon.name + '</div>' +
+      '<div class="zyt_icon_class">' + zyt_icon.cls + '</div>';
+    zyt_card.addEventListener('click', zyt_copyClass);
+    zyt_grid.appendChild(zyt_card);
+  });
+}
+
+function zyt_copyClass(zyt_e) {
+  var zyt_cls = zyt_e.currentTarget.dataset.cls;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(zyt_cls);
+  } else {
+    var zyt_ta = document.createElement('textarea');
+    zyt_ta.value = zyt_cls;
+    document.body.appendChild(zyt_ta);
+    zyt_ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(zyt_ta);
+  }
+  zyt_showToast();
+}
+
+var zyt_toastTimer = null;
+function zyt_showToast() {
+  var zyt_toast = document.getElementById('zyt_toast');
+  zyt_toast.classList.add('zyt_show');
+  clearTimeout(zyt_toastTimer);
+  zyt_toastTimer = setTimeout(function() {
+    zyt_toast.classList.remove('zyt_show');
+  }, 1500);
+}
+
+/* ===== zyt 筛选交互 ===== */
+document.getElementById('zyt_filters').addEventListener('click', function(zyt_e) {
+  var zyt_btn = zyt_e.target.closest('.zyt_filter_btn');
+  if (!zyt_btn) return;
+  document.querySelectorAll('.zyt_filter_btn').forEach(function(b) { b.classList.remove('zyt_active'); });
+  zyt_btn.classList.add('zyt_active');
+  zyt_currentFilter = zyt_btn.dataset.filter;
+  zyt_render();
+});
+
+zyt_render();
+</script>
+</body>
+</html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>图标陈列 · Icon Archive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,800;1,400&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ===== zyt 设计 token ===== */
+  :root {
+    --zyt-bg: #F5F3EE;
+    --zyt-ink: #1C1917;
+    --zyt-muted: #6B635A;
+    --zyt-border: #D9D4C7;
+    --zyt-card: #FFFFFF;
+    --zyt-accent-warm: #8B4513;   /* iconfont-1 对应 */
+    --zyt-accent-cool: #3A6FF8;  /* iconfont-2 对应 */
+    --zyt-serif: 'Playfair Display', Georgia, serif;
+    --zyt-sans: 'Inter', -apple-system, sans-serif;
+    --zyt-grotesk: 'Space Grotesk', 'Inter', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--zyt-sans);
+    background-color: var(--zyt-bg);
+    color: var(--zyt-ink);
+    line-height: 1.6;
+    min-height: 100vh;
+    padding: 4rem 1.5rem;
+  }
+
+  .zyt_container {
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  /* —— 头部 —— */
+  .zyt_header {
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+  .zyt_eyebrow {
+    font-family: var(--zyt-sans);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    color: var(--zyt-muted);
+    margin-bottom: 1.5rem;
+  }
+  .zyt_title {
+    font-family: var(--zyt-serif);
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    margin-bottom: 1.25rem;
+  }
+  .zyt_subtitle {
+    font-size: 1.05rem;
+    color: var(--zyt-muted);
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  /* —— 卡片网格 —— */
+  .zyt_grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 1.5rem;
+  }
+  .zyt_card {
+    display: block;
+    background: var(--zyt-card);
+    border: 1px solid var(--zyt-border);
+    padding: 2.5rem 2rem;
+    text-decoration: none;
+    color: var(--zyt-ink);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .zyt_card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--zyt-accent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .zyt_card:hover {
+    border-color: var(--zyt-accent);
+    box-shadow: 0 8px 32px rgba(28, 25, 23, 0.08);
+    transform: translateY(-2px);
+  }
+  .zyt_card:hover::before { opacity: 1; }
+
+  .zyt_card[data-variant="warm"] { --zyt-accent: var(--zyt-accent-warm); }
+  .zyt_card[data-variant="cool"] { --zyt-accent: var(--zyt-accent-cool); }
+  .zyt_card[data-variant="green"] { --zyt-accent: #3E7C59; }
+  .zyt_card[data-variant="red"] { --zyt-accent: #FF3B5C; }
+
+  .zyt_card_num {
+    font-family: var(--zyt-serif);
+    font-size: 0.875rem;
+    color: var(--zyt-muted);
+    font-style: italic;
+    margin-bottom: 1rem;
+  }
+  .zyt_card_title {
+    font-family: var(--zyt-serif);
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+  }
+  .zyt_card_desc {
+    font-size: 0.92rem;
+    color: var(--zyt-muted);
+    margin-bottom: 1.5rem;
+  }
+  .zyt_card_meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--zyt-muted);
+    border-top: 1px solid var(--zyt-border);
+    padding-top: 1rem;
+  }
+  .zyt_card_meta .zyt_tag {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border: 1px solid var(--zyt-border);
+    font-family: var(--zyt-grotesk);
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    color: var(--zyt-ink);
+  }
+  .zyt_card:hover .zyt_card_meta .zyt_tag {
+    border-color: var(--zyt-accent);
+    color: var(--zyt-accent);
+  }
+  .zyt_card_arrow {
+    font-family: var(--zyt-grotesk);
+    font-weight: 500;
+    letter-spacing: 0.05em;
+  }
+
+  /* —— 页脚 —— */
+  .zyt_footer {
+    margin-top: 5rem;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--zyt-muted);
+  }
+
+  @media (max-width: 480px) {
+    body { padding: 2.5rem 1rem; }
+    .zyt_card { padding: 2rem 1.5rem; }
+  }
+</style>
+</head>
+<body>
+<div class="zyt_container">
+
+  <header class="zyt_header">
+    <p class="zyt_eyebrow">CURATED · 2026</p>
+    <h1 class="zyt_title">图标作为艺术形式</h1>
+    <p class="zyt_subtitle">两种截然不同的呈现方式，探索图标在当代界面设计中的表达力与可能性。</p>
+  </header>
+
+  <main class="zyt_grid">
+
+    <a href="iconfont-1.html" class="zyt_card" data-variant="warm">
+      <p class="zyt_card_num">— I.</p>
+      <h2 class="zyt_card_title">Font Awesome 字体图标</h2>
+      <p class="zyt_card_desc">经典字体图标方案。通过 CSS 类名直接调用数百个预绘图标，零额外请求，适合快速构建与统一风格。</p>
+      <div class="zyt_card_meta">
+        <span class="zyt_tag">FONT ICON</span>
+        <span class="zyt_card_arrow">进入 →</span>
+      </div>
+    </a>
+
+    <a href="iconfont-2.html" class="zyt_card" data-variant="cool">
+      <p class="zyt_card_num">— II.</p>
+      <h2 class="zyt_card_title">Lucide SVG 图标</h2>
+      <p class="zyt_card_desc">现代 SVG 图标方案。每个图标都是矢量路径，可自由调整颜色、描边粗细与尺寸，精确控制每一处细节。</p>
+      <div class="zyt_card_meta">
+        <span class="zyt_tag">SVG · LINEAR</span>
+        <span class="zyt_card_arrow">进入 →</span>
+      </div>
+    </a>
+
+    <a href="iconfont-3.html" class="zyt_card" data-variant="green">
+      <p class="zyt_card_num">— III.</p>
+      <h2 class="zyt_card_title">移动端底导航 · 字体图标</h2>
+      <p class="zyt_card_desc">「藏集」市集 App。iconfont 字体图标驱动四项固定底导航，含数字徽章与红点，宽度自适应演示。</p>
+      <div class="zyt_card_meta">
+        <span class="zyt_tag">FONT-CLASS · TABBAR</span>
+        <span class="zyt_card_arrow">进入 →</span>
+      </div>
+    </a>
+
+    <a href="iconfont-4.html" class="zyt_card" data-variant="red">
+      <p class="zyt_card_num">— IV.</p>
+      <h2 class="zyt_card_title">移动端底导航 · SVG</h2>
+      <p class="zyt_card_desc">「Pulse」社交 App。iconfont SVG symbol 雪碧图驱动同款底导航，currentColor 控色，红点呼吸动效。</p>
+      <div class="zyt_card_meta">
+        <span class="zyt_tag">SVG-SYMBOL · TABBAR</span>
+        <span class="zyt_card_arrow">进入 →</span>
+      </div>
+    </a>
+
+  </main>
+
+  <footer class="zyt_footer">
+    图标艺术陈列室 · Icon Archive
+  </footer>
+
+</div>
+</body>
+</html>
