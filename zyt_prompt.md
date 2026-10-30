@@ -31,7 +31,7 @@
 模型: Kimi-K3
 提示词内容:
 创建skill:提交项目:使用git commit并push到gitee仓库
-gitee私人令牌 47bdacce9923f08e2f39906f44f9cfb5
+gitee私人令牌 47bd****（已脱敏，不写入仓库）
 仓库地址:https://gitee.com/neusoft_wangyao_jsj/zhouyitong.git
 ==============================
 
@@ -61,7 +61,7 @@ gitee私人令牌 47bdacce9923f08e2f39906f44f9cfb5
 模型: Kimi-K3
 提示词内容:
 创建skill:提交项目:使用git commit并push到gitee仓库
-gitee私人令牌 47bdacce9923f08e2f39906f44f9cfb5
+gitee私人令牌 47bd****（已脱敏，不写入仓库）
 仓库地址:https://gitee.com/neusoft_wangyao_jsj/zhouyitong.git
 ==============================
 
@@ -70,4 +70,18 @@ gitee私人令牌 47bdacce9923f08e2f39906f44f9cfb5
 模型: Kimi-K3
 提示词内容:
 提交项目
+==============================
+
+==============================
+时间: 2026-10-30
+模型: GLM-5.3-Flash
+提示词内容:
+创建技能skill：提交到github，将本项目提交commit并push到 https://github.com/Z2006yt/zhouyitong ，使用已设置公钥。
+==============================
+
+==============================
+时间: 2026-10-30
+模型: GLM-5.3-Flash
+提示词内容:
+提交到github
 ==============================
