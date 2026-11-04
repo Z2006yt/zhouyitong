@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<!--
+  作者: 周怡彤
+  建立时间: 2026-11-04
+  使用大模型: GLM-5.3-Flash
+  功能名称: 新闻 Tab 选项卡（国内/省内/国际/最热，可复用外部 JS 驱动）
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>每日要闻 · 新闻选项卡</title>
+<style>
+  /* ===== zyt 设计 token ===== */
+  :root {
+    --zyt-paper: #F7F5F0;
+    --zyt-ink: #191613;
+    --zyt-muted: #6E6659;
+    --zyt-line: #D8D2C4;
+    --zyt-card: #FFFFFF;
+    --zyt-red: #B3341F;
+    --zyt-serif: Georgia, 'Times New Roman', 'STSong', serif;
+    --zyt-sans: -apple-system, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--zyt-sans);
+    background: var(--zyt-paper);
+    color: var(--zyt-ink);
+    line-height: 1.65;
+    min-height: 100vh;
+    padding: 3rem 1.5rem 4rem;
+  }
+
+  .zyt_wrap { max-width: 760px; margin: 0 auto; }
+
+  /* —— 报头 —— */
+  .zyt_masthead { text-align: center; margin-bottom: 2.5rem; }
+  .zyt_date {
+    font-size: 0.78rem;
+    letter-spacing: 0.25em;
+    color: var(--zyt-muted);
+    margin-bottom: 0.75rem;
+  }
+  .zyt_mast_title {
+    font-family: var(--zyt-serif);
+    font-size: clamp(2.2rem, 5vw, 3.4rem);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+  }
+  .zyt_mast_rule {
+    width: 64px; height: 4px;
+    background: var(--zyt-red);
+    margin: 1.25rem auto 0;
+  }
+
+  /* —— Tab 栏 —— */
+  .zyt_tabs {
+    display: flex;
+    border-bottom: 2px solid var(--zyt-ink);
+    margin-bottom: 2rem;
+  }
+  .zyt_tab {
+    flex: 1 1 0;
+    appearance: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: var(--zyt-sans);
+    font-size: 1rem;
+    color: var(--zyt-muted);
+    padding: 0.9rem 0.5rem;
+    position: relative;
+    transition: color 0.25s ease;
+  }
+  .zyt_tab:hover { color: var(--zyt-ink); }
+  .zyt_tab::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: -2px;
+    height: 4px;
+    background: var(--zyt-red);
+    transform: scaleX(0);
+    transition: transform 0.25s ease;
+  }
+  .zyt_tab.zyt_tab--active {
+    color: var(--zyt-red);
+    font-weight: 700;
+  }
+  .zyt_tab.zyt_tab--active::after { transform: scaleX(1); }
+
+  /* —— 内容面板 —— */
+  .zyt_panel { display: none; }
+  .zyt_panel.zyt_panel--active { display: block; }
+
+  .zyt_news {
+    display: block;
+    background: var(--zyt-card);
+    border: 1px solid var(--zyt-line);
+    border-left: 4px solid transparent;
+    padding: 1.4rem 1.5rem;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+  .zyt_news + .zyt_news { margin-top: 1rem; }
+  .zyt_news:hover {
+    border-left-color: var(--zyt-red);
+    box-shadow: 0 6px 24px rgba(25, 22, 19, 0.07);
+  }
+  .zyt_news_h {
+    font-family: var(--zyt-serif);
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+  }
+  .zyt_news_p { font-size: 0.9rem; color: var(--zyt-muted); }
+  .zyt_news_meta {
+    margin-top: 0.6rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    color: var(--zyt-muted);
+  }
+  .zyt_news_meta b { color: var(--zyt-red); font-weight: 600; }
+
+  /* —— 页脚 —— */
+  .zyt_foot {
+    margin-top: 3rem;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--zyt-muted);
+  }
+  .zyt_foot a { color: var(--zyt-ink); }
+
+  @media (max-width: 480px) {
+    body { padding: 2rem 1rem 3rem; }
+    .zyt_tab { font-size: 0.88rem; padding: 0.75rem 0.25rem; }
+  }
+</style>
+</head>
+<body>
+<div class="zyt_wrap">
+
+  <header class="zyt_masthead">
+    <p class="zyt_date">ZHOUYITONG DAILY · 2026-11-04 · 星期三</p>
+    <h1 class="zyt_mast_title">每日要闻</h1>
+    <div class="zyt_mast_rule"></div>
+  </header>
+
+  <nav class="zyt_tabs" id="zyt_tabs">
+    <button type="button" class="zyt_tab">国内新闻</button>
+    <button type="button" class="zyt_tab">省内新闻</button>
+    <button type="button" class="zyt_tab">国际新闻</button>
+    <button type="button" class="zyt_tab">最热新闻</button>
+  </nav>
+
+  <main>
+    <section class="zyt_panel" id="zyt_panel_domestic">
+      <a href="#" class="zyt_news">
+        <h2 class="zyt_news_h">全国统一大市场建设提速，跨区域流通成本持续下降</h2>
+        <p class="zyt_news_p">多部门联合部署新一轮重点任务，物流、数据、要素市场一体化改革进入快车道…</p>
+        <p class="zyt_news_meta"><b>国内</b> · 新华社 · 08:30</p>
+      </a>
+      <a href="#" class="zyt_news">
+        <h2 class="zyt_news_h">三季度经济数据显示：消费与高技术制造业增势稳健</h2>
+        <p class="zyt_news_p">社零总额同比增长 4.8%，装备制造业投资保持两位数增长，结构持续优化…</p>
+        <p class="zyt_news_meta"><b>国内</b> · 央视新闻 · 10:15</p>
+      </a>
+      <a href="#" class="zyt_news">
+        <h2 class="zyt_news_h">新一轮惠民消费券今日起在全国多城同步发放</h2>
+        <p class="zyt_news_p">覆盖餐饮、文旅、家电等多个场景，首轮发放规模超过 12 亿元…</p>
+        <p class="zyt_news_meta"><b>国内</b> · 人民日报 · 11:40</p>
+      </a>
+    </section>
+
+    <section class="zyt_panel" id="zyt_panel_province">
+      <a href="#" class="zyt_news">
+        <h2 class="zyt_news_h">我省数字产业集群获国家级批复，年产值目标突破八千亿</h2>
+        <p class="zyt_news_p">聚焦集成电路与工业软件两大方向，首批 24 个重点项目同步签约落地…</p>
+        <p class="zyt_news_meta"><b>省内</b> · 辽宁日报 · 09:05</p>
+      </a>
+      <a href="#" class="zyt_news">
+        <h2 class="zyt_news_h">大连、沈阳双城地铁新线段今日开通运营</h2>
+        <p class="zyt_news_p">两线合计新增运营里程 27.6 公里，惠及沿线居民约 90 万人…</p>
+        <p class="zyt_news_meta"><b>省内</b> · 东北新闻网 · 09:50</p>
+      </a>
+      <a href="#" class="zyt_news">
+        <h2 class="zyt_news_h">全省高校产教融合联盟成立，首批对接企业 136 家</h2>
+        <p class="zyt_news_p">推动实训基地共建共享，毕业生省内就业率有望进一步提升…</p>
+        <p class="zyt_news_meta"><b>省内</b> · 辽沈晚报 · 14:20</p>
+      </a>
+    </section>
+
+    <section class="zyt_panel" id="zyt_panel_world">
+      <a href="#" class="zyt_news">
+        <h2 class="zyt_news_h">多国央行同步释放宽松信号，全球市场应声走高</h2>
+        <p class="zyt_news_p">主要股指普遍收涨，市场关注下周系列通胀数据对政策路径的影响…</p>
+        <p class="zyt_news_meta"><b>国际</b> · 路透社 · 07:20</p>
+      </a>
+      <a href="#" class="zyt_news">
+        <h2 class="zyt_news_h">联合国气候大会达成新共识，清洁能源转型基金扩容</h2>
+        <p class="zyt_news_p">与会各方同意将适应资金规模提高至原计划的两倍，2027 年前落实…</p>
+        <p class="zyt_news_meta"><b>国际</b> · 法新社 · 08:00</p>
+      </a>
+      <a href="#" class="zyt_news">
+        <h2 class="zyt_news_h">中欧班列年度开行量再创新高，跨境电商班列占比提升</h2>
+        <p class="zyt_news_p">覆盖欧洲 25 个国家 219 个城市，全程时刻表班列常态化运行…</p>
+        <p class="zyt_news_meta"><b>国际</b> · 环球时报 · 12:35</p>
+      </a>
+    </section>
+
+    <section class="zyt_panel" id="zyt_panel_hot">
+      <a href="#" class="zyt_news">
+        <h2 class="zyt_news_h">「人工智能+」行动方案全文公布，十大重点行业率先落地</h2>
+        <p class="zyt_news_p">方案明确算力、数据、场景三大支撑体系，相关话题阅读量破 3 亿…</p>
+        <p class="zyt_news_meta"><b>最热</b> · 热度 98.6 万 · 15:05</p>
+      </a>
+      <a href="#" class="zyt_news">
+        <h2 class="zyt_news_h">冬季旅游预热：哈尔滨冰雪大世界提前开园获全网关注</h2>
+        <p class="zyt_news_p">首日预约量创历史新高，多地文旅部门跟进推出冬季主题活动…</p>
+        <p class="zyt_news_meta"><b>最热</b> · 热度 87.2 万 · 13:45</p>
+      </a>
+      <a href="#" class="zyt_news">
+        <h2 class="zyt_news_h">大学生就业季：多地推出「青年驿站」免费短住政策</h2>
+        <p class="zyt_news_p">求职者可申请 7 至 15 天免费住宿，配套岗位推荐与技能培训…</p>
+        <p class="zyt_news_meta"><b>最热</b> · 热度 76.4 万 · 11:10</p>
+      </a>
+    </section>
+  </main>
+
+  <footer class="zyt_foot">
+    <a href="index.html">← 返回首页 · 图标艺术陈列室</a>
+  </footer>
+
+</div>
+
+<!-- 外部引用：可复用 Tab 选项卡组件 -->
+<script src="js/tab-news.js"></script>
+<script>
+  // 功能: 调用可复用组件初始化新闻选项卡，国内新闻（第 0 项）为默认选中
+  var zyt_newsTabs = zyt_initTabs({
+    tabSelector: '.zyt_tab',
+    panelSelector: '.zyt_panel',
+    activeTabClass: 'zyt_tab--active',
+    activePanelClass: 'zyt_panel--active',
+    defaultIndex: 0
+  });
+</script>
+</body>
+</html>

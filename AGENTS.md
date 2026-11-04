@@ -12,6 +12,23 @@
 - CSS classes, ID names, JS variables **must start with `zyt_`** (enforced by zyt_prompt.md)
 - Example: `<div class="zyt-nav">`, `const zytData = ...`
 
+## Comment convention
+
+- **New HTML files**: add a comment block right after `<!DOCTYPE html>` (or inside `<head>`) containing all four items — author 周怡彤, creation date, the AI model used, and the feature name:
+  ```html
+  <!--
+    作者: 周怡彤
+    建立时间: YYYY-MM-DD
+    使用大模型: <model name>
+    功能名称: <feature / page purpose>
+  -->
+  ```
+- **JS functions**: every function must carry a comment above it describing what it mainly does:
+  ```js
+  // 功能: 切换底部导航选中态并清除对应徽章
+  function zyt_switchTab(idx) { ... }
+  ```
+
 ## Git / Gitee
 
 - Remote: `https://gitee.com/neusoft_wangyao_jsj/zhouyitong.git`
