@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>抓小球游戏|函数的三个方法的应用</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f0f8ff;
+            height: 100vh;
+            overflow: hidden;
+            font-size: 24px;
+        }
+
+        #info {
+            padding: 16px;
+            background: #222;
+            color: #fff;
+        }
+
+        .ball {
+            width: 50px;
+            height: 50px;
+            background: red;
+            border-radius: 50%;
+            position: absolute;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="info">当前分数：<span id="score">0</span></div>
+    <div class="ball" id="ball"></div>
+
+    <script>
+        // const是常量指的是变量的引用地址不能变，不是对象里面的数据不能改。
+        const game = {
+            score: 0,
+            ballDom: document.getElementById("ball"),
+            width: 50,
+            height: 50
+        };//需要什么函数：小球移动、小球点击、空白点击、更新分数
+
+        // 问题：如果不减去小球的宽度，直接写 Math.random() * window.innerWidth 会怎么样？
+        function moveBall() {
+            // 保证小球在屏幕内
+            const maxX = window.innerWidth - game.width;
+            const maxY = window.innerHeight - game.height;
+            // 小球随机位置是0-窗口宽度取整
+            const randomX = Math.floor(Math.random() * maxX);
+            const randomY = Math.floor(Math.random() * maxY);
+            // 移动小球
+            game.ballDom.style.left = randomX + "px";
+            game.ballDom.style.top = randomY + "px";
+        }
+        // 更新分数
+        // 普通的函数存在函数提升：函数体在后面，函数的调用在前面，
+        // 有this、arguments：类数组对象，函数在调用时候传递过来的实参数字对象
+        function updateScore() {
+            // function updateScore(a,b)
+            // a=arguments[0]
+            // b=arguments[1]
+            document.getElementById("score").innerText = game.score;
+        }
+        game.ballDom.addEventListener("click", function (e) {
+            // 匿名函数有 this → 当前点击的DOM元素（.ball）
+            game.score += 2;
+            updateScore();//函数调用
+            moveBall();
+            // 阻止冒泡
+            e.stopPropagation();
+        });
+        // 点击空白区域扣分
+        document.body.addEventListener("click", function (e) {
+
+            game.score -= 1;
+
+            updateScore();
+
+        });
+        window.addEventListener("resize", function () {
+            moveBall();
+        });
+    //游戏扩展任务：同时产生多个小球，但是不能交叉，小球定时随机换位置，所有小球全部点击才加分否则扣分
+        // 每组推一个人讲逻辑
+
+// 扩展配置：同时生成小球数量
+game.ballCount = 3;
+// 保存所有小球DOM元素和坐标信息的数组，用来做碰撞检测、管理小球
+game.ballList = [];
+// 本轮已经点击的小球数量，用来判断本轮是否全部点完
+game.clickedNum = 0;
+
+/**
+ * 函数：createMultiBall()
+ * 功能：生成多个不重叠小球
+ * 实现思路：
+ * 1. 先清除上一轮全部小球，清空数组、重置点击计数
+ * 2. for循环，按ballCount数量逐个创建小球
+ * 3. while循环随机生成坐标，循环校验：和已存在小球做距离碰撞检测
+ * 4. 坐标安全不重叠后，创建div小球，存入ballList数组
+ * 5. 给每个小球绑定点击事件：隐藏小球、点击计数+1，全部点完加分
+ */
+// 生成多个不重叠小球
+function createMultiBall() {
+    // 先删除上一轮所有扩展小球：遍历ballList数组，调用dom原生remove()移除页面元素
+    game.ballList.forEach(item => {
+        item.dom.remove();
+    })
+    // 清空小球数组，数组方法forEach遍历完成后重置
+    game.ballList = [];
+    //重置本轮点击计数，开启新一轮游戏
+    game.clickedNum = 0;
+    // 循环创建指定数量小球：for循环，i从0开始，循环ballCount次
+    for (let i = 0; i < game.ballCount; i++) {
+        // 标记坐标是否安全（不重叠），初始false，需要循环寻找合法位置
+        let isSafe = false;
+        // 定义小球坐标变量x：水平 left；y：垂直 top
+        let x, y;
+        // while循环：在位置不安全时持续循环，反复随机生成坐标，直到找到不重叠位置
+        while (!isSafe) {
+            // 计算随机坐标最大边界：窗口宽/高减去小球自身宽高，防止小球超出屏幕
+            const maxX = window.innerWidth - game.width;
+            const maxY = window.innerHeight - game.height;
+            // Math.random()：0~1随机小数；乘maxX得到范围；Math.floor向下取整，得到整数像素
+            x = Math.floor(Math.random() * maxX);
+            y = Math.floor(Math.random() * maxY);
+            // 先假设当前坐标安全，后续碰撞检测如果重叠再改为false
+            isSafe = true;
+            // for...of循环：遍历已经生成好的小球数组，逐个做碰撞判断
+            for (let b of game.ballList) {
+                // dx：两个小球水平方向距离差值；dy：垂直方向距离差值
+                const dx = x - b.x;
+                const dy = y - b.y;
+                // Math.sqrt()：平方根函数，利用勾股定理，计算两个小球圆心直线距离
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                // 碰撞规则：两个小球圆心距离小于小球宽度 → 判断重叠，位置无效
+                if (distance < game.width) {
+                    isSafe = false;
+                    // 重叠直接跳出for循环，回到while重新随机位置
+                    break;
+                }
+            }
+        }
+        // document.createElement('div')：DOM方法，创建div标签，作为小球
+        const newBall = document.createElement('div');
+        // 给小球添加class类名ball，用来css样式控制
+        newBall.className = 'ball';
+        // 设置小球left样式，控制水平位置，拼接px像素单位
+        newBall.style.left = x + 'px';
+        // 设置小球top样式，控制垂直位置，拼接px像素单位
+        newBall.style.top = y + 'px';
+        // document.body.appendChild()：DOM追加方法，把小球添加到页面body中显示
+        document.body.appendChild(newBall);
+        // 封装小球对象：保存小球dom对象、x、y坐标，存入数组供碰撞检测使用
+        const ballItem = {
+            dom: newBall,
+            x: x,
+            y: y
+        }
+        // 数组push方法：把小球对象追加到ballList数组尾部
+        game.ballList.push(ballItem);
+        // addEventListener：DOM绑定事件方法，给小球绑定click点击事件
+        newBall.addEventListener('click', function (e) {
+            // e.stopPropagation()：阻止事件冒泡，防止点击小球触发页面其他点击事件
+            e.stopPropagation();
+            // 点击后设置display:none，隐藏当前小球
+            this.style.display = 'none';
+            // 本轮点击数量自增+1
+            game.clickedNum++;
+            // 判断条件：本轮点击总数 = 小球总数 → 本轮全部小球点击完成
+            if (game.clickedNum === game.ballList.length) {
+                // 分数 +5
+                game.score += 5;
+                // 调用更新分数函数，刷新页面分数显示（外部提前实现）
+                updateScore();
+            }
+        })
+    }
+}
+
+/**
+ * 函数：multiMoveBall()
+ * 功能：定时轮换小球位置，5秒时限机制
+ * 实现思路：
+ * setInterval定时器，每5秒执行一次回调
+ * 如果5秒内没有点完全部小球 → 扣分，然后直接生成新一轮小球
+ */
+// 扩展：定时轮换小球位置，5秒时限
+function multiMoveBall() {
+    // setInterval()：定时器函数，每隔固定毫秒数重复执行回调函数
+    setInterval(function () {
+        // 判断：本轮点击数量 < 小球总数 → 超时没点完，判定失败
+        if (game.clickedNum < game.ballList.length) {
+            // 分数 -3
+            game.score -= 3;
+            // 调用更新分数函数
+            updateScore();
+        }
+        // 无论成功/超时失败，都重新生成新一轮小球
+        createMultiBall();
+    }, 5000); // ✅ 修改为5000毫秒 = 5秒，setInterval第二个参数：间隔毫秒数
+}
+
+// 程序入口调用1：页面加载完成后，立刻生成第一组小球
+createMultiBall();
+// 程序入口调用2：开启定时器，启动5秒倒计时轮换机制
+multiMoveBall();
+        moveBall();
+    </script>
+</body>
+
+</html>

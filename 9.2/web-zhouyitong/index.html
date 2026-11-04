@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>周怡彤的《高级网页设计》课堂实践</title>
+  <style>
+    :root {
+      --bg-1: #f4f7ff;
+      --bg-2: #eef6ff;
+      --card: rgba(255, 255, 255, 0.88);
+      --card-strong: #ffffff;
+      --primary: #4f7cff;
+      --primary-deep: #2d5bff;
+      --accent: #ff7aa2;
+      --accent-soft: #ffd7e6;
+      --text: #22314d;
+      --muted: #6b7a99;
+      --line: rgba(79, 124, 255, 0.14);
+      --shadow: 0 16px 40px rgba(51, 73, 128, 0.12);
+      --success: #39b38a;
+      --warning: #f9a826;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Microsoft YaHei", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(143, 196, 255, 0.26), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(255, 156, 182, 0.2), transparent 24%),
+        linear-gradient(135deg, var(--bg-1), var(--bg-2));
+      min-height: 100vh;
+    }
+
+    .page {
+      width: min(1100px, calc(100% - 32px));
+      margin: 32px auto 48px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, rgba(79, 124, 255, 0.95), rgba(72, 180, 255, 0.9));
+      color: #fff;
+      border-radius: 28px;
+      padding: 40px 38px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before,
+    .hero::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .hero::before {
+      width: 240px;
+      height: 240px;
+      right: -50px;
+      top: -70px;
+    }
+
+    .hero::after {
+      width: 180px;
+      height: 180px;
+      left: -30px;
+      bottom: -60px;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 7px 14px;
+      background: rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 999px;
+      font-size: 13px;
+      letter-spacing: 1px;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 3vw, 3rem);
+      line-height: 1.2;
+      letter-spacing: 1px;
+    }
+
+    .subtitle {
+      margin-top: 14px;
+      font-size: 1.05rem;
+      line-height: 1.8;
+      color: rgba(255, 255, 255, 0.9);
+      max-width: 760px;
+    }
+
+    .top-meta {
+      margin-top: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .meta-pill {
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      font-size: 0.9rem;
+    }
+
+    .content {
+      margin-top: 28px;
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 24px;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+
+    .catalog {
+      padding: 28px 28px 18px;
+    }
+
+    .section-title {
+      margin: 0 0 18px;
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      box-shadow: 0 0 0 6px rgba(79, 124, 255, 0.12);
+    }
+
+    .modules {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+    }
+
+    .module-card {
+      display: block;
+      text-decoration: none;
+      color: var(--text);
+      background: linear-gradient(180deg, var(--card-strong), rgba(240, 246, 255, 0.9));
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 18px 16px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      box-shadow: 0 8px 18px rgba(43, 67, 110, 0.05);
+    }
+
+    .module-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 18px 30px rgba(61, 77, 120, 0.12);
+      border-color: rgba(79, 124, 255, 0.32);
+    }
+
+    .module-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .module-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      font-size: 1.4rem;
+      color: #fff;
+      background: linear-gradient(135deg, var(--primary), #7ea2ff);
+      box-shadow: inset 0 1px 1px rgba(255,255,255,0.25);
+    }
+
+    .module-tag {
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      color: var(--success);
+      background: rgba(57, 179, 138, 0.08);
+      border: 1px solid rgba(57, 179, 138, 0.15);
+    }
+
+    .module-card h3 {
+      margin: 0 0 10px;
+      font-size: 1.1rem;
+    }
+
+    .module-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.7;
+    }
+
+    .prompt {
+      padding: 26px 24px;
+    }
+
+    .prompt-box {
+      background: linear-gradient(180deg, rgba(255, 122, 162, 0.08), rgba(79,124,255,0.04));
+      border: 1px solid rgba(255, 122, 162, 0.2);
+      border-radius: 18px;
+      padding: 18px 18px 14px;
+    }
+
+    .prompt-box h3 {
+      margin: 0 0 10px;
+      font-size: 1.15rem;
+      color: var(--primary-deep);
+    }
+
+    .prompt-box blockquote {
+      margin: 0;
+      color: var(--text);
+      line-height: 1.8;
+      font-size: 0.96rem;
+    }
+
+    .summary {
+      margin-top: 30px;
+      padding: 24px 26px;
+    }
+
+    .summary-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    .summary-list li {
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(79, 124, 255, 0.04);
+      border: 1px solid rgba(79, 124, 255, 0.09);
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .summary-list strong {
+      color: var(--primary-deep);
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+      padding: 20px 0 10px;
+    }
+
+    @media (max-width: 780px) {
+      .content {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        padding: 28px 20px;
+      }
+
+      .catalog,
+      .prompt,
+      .summary {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="hero">
+      <div class="hero-inner">
+        <div class="tag">课堂实践 · 课程导航页</div>
+        <h1>周怡彤的《高级网页设计》课堂实践</h1>
+        <p class="subtitle">
+          这里汇总了本课程中已完成的网页案例与后续学习模块，展示前端基础、布局与图标应用的阶段性成果。
+        </p>
+        <div class="top-meta">
+          <span class="meta-pill">课程主题：高级网页设计</span>
+          <span class="meta-pill">课题：原生代码实践</span>
+          <span class="meta-pill">目录：持续更新</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="content">
+      <section class="panel catalog" aria-labelledby="catalog-title">
+        <h2 id="catalog-title" class="section-title">课堂目录</h2>
+        <div class="modules">
+          <a class="module-card" href="./flex.html" target="_blank" rel="noopener noreferrer">
+            <div class="module-top">
+              <div class="module-icon">✦</div>
+              <span class="module-tag">已完成</span>
+            </div>
+            <h3>Flex复习</h3>
+            <p>复习弹性布局示例，包括导航栏、三栏布局、卡片布局与侧边栏结构。</p>
+          </a>
+
+          <a class="module-card" href="./svg.html" target="_blank" rel="noopener noreferrer">
+            <div class="module-top">
+              <div class="module-icon">⬢</div>
+              <span class="module-tag">已完成</span>
+            </div>
+            <h3>SVG图标</h3>
+            <p>使用 SVG 图标与交互切换效果，展示图标导航的制作思路与实现方式。</p>
+          </a>
+
+          <a class="module-card" href="./font/date%20Type.html" target="_blank" rel="noopener noreferrer">
+            <div class="module-top">
+              <div class="module-icon" style="background: linear-gradient(135deg, #35b8a0, #1687a7);">▣</div>
+              <span class="module-tag">后续模板</span>
+            </div>
+            <h3>数据类型与运算符</h3>
+            <p>学习 JavaScript 数据类型、运算符、类型转换、循环判断与基础算法实践。</p>
+          </a>
+
+          <a class="module-card" href="./object.html" target="_blank" rel="noopener noreferrer">
+            <div class="module-top">
+              <div class="module-icon" style="background: linear-gradient(135deg, #e9a23b, #dc6b45);">{ }</div>
+              <span class="module-tag">已完成</span>
+            </div>
+            <h3>JS对象</h3>
+            <p>练习对象的创建、属性与方法、对象遍历，以及引用赋值的特点。</p>
+          </a>
+
+          <a class="module-card" href="./JSobject.html" target="_blank" rel="noopener noreferrer">
+            <div class="module-top">
+              <div class="module-icon" style="background: linear-gradient(135deg, #ff7a59, #e84a5f);">{ }</div>
+              <span class="module-tag">已完成</span>
+            </div>
+            <h3>JS对象的应用</h3>
+            <p>通过学生明信片案例练习对象属性、方法、this 指向与年级更新。</p>
+          </a>
+
+          <a class="module-card" href="./font/function.html" target="_blank" rel="noopener noreferrer">
+            <div class="module-top">
+              <div class="module-icon" style="background: linear-gradient(135deg, #537cce, #35a8b5);">ƒ</div>
+              <span class="module-tag">已完成</span>
+            </div>
+            <h3>JS函数</h3>
+            <p>通过猜数字小游戏了解匿名函数、箭头函数、随机数生成与函数调用。</p>
+          </a>
+
+          <a class="module-card" href="./function_apply.html" target="_blank" rel="noopener noreferrer">
+            <div class="module-top">
+              <div class="module-icon" style="background: linear-gradient(135deg, #7359a5, #537cce);">ƒ()</div>
+              <span class="module-tag">已完成</span>
+            </div>
+            <h3>函数的三个方法应用</h3>
+            <p>结合抓小球游戏，了解函数方法、事件监听与定时器的应用。</p>
+          </a>
+
+          <a class="module-card" href="./JS_obj_fun005.html" target="_blank" rel="noopener noreferrer">
+            <div class="module-top">
+              <div class="module-icon" style="background: linear-gradient(135deg, #7359a5, #be5b88);">JS</div>
+              <span class="module-tag">已完成</span>
+            </div>
+            <h3>JS内部对象</h3>
+            <p>通过示例了解 Math、Date 与数组对象的常用属性和方法。</p>
+          </a>
+
+          <a class="module-card" href="./event005.html" target="_blank" rel="noopener noreferrer">
+            <div class="module-top">
+              <div class="module-icon" style="background: linear-gradient(135deg, #248a78, #58b88a);">↕</div>
+              <span class="module-tag">已完成</span>
+            </div>
+            <h3>事件的冒泡与捕获</h3>
+            <p>观察事件在 DOM 元素间的传播顺序，并练习停止冒泡和事件监听。</p>
+          </a>
+
+          <div class="module-card" aria-label="后续模块待更新" style="cursor: default; opacity: 0.9;">
+            <div class="module-top">
+              <div class="module-icon" style="background: linear-gradient(135deg, #ffb14a, #ff7a59);">＋</div>
+              <span class="module-tag" style="color: var(--warning); background: rgba(249, 168, 38, 0.09); border-color: rgba(249,168,38,0.15);">待更新</span>
+            </div>
+            <h3>其余模块</h3>
+            <p>后续课程内容将持续补充，敬请期待更多网页设计与前端实践案例。</p>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel prompt" aria-labelledby="prompt-title">
+        <div class="prompt-box">
+          <h3 id="prompt-title">本提示词</h3>
+          <blockquote>
+            之前创建的页面，包括本目录下的所有网页的超链接，使用原生代码，不使用 CDN，新页面名称为 index.html，主题为周怡彤的《高级网页设计》课堂实践，美化页面，课堂目录中包含 Flex 复习、SVG 图标、数据类型与运算符、JS对象、JS对象的应用、JS函数、JS内部对象、事件的冒泡与捕获。页面中包括本提示词。
+          </blockquote>
+        </div>
+      </aside>
+    </main>
+
+    <section class="panel summary" aria-labelledby="summary-title">
+      <h2 id="summary-title" class="section-title">学习成果概览</h2>
+      <ul class="summary-list">
+        <li><strong>Flex复习：</strong> 掌握常用布局结构与响应式排版。</li>
+        <li><strong>SVG图标：</strong> 了解图标的交互式展示与切换。</li>
+        <li><strong>数据类型与运算符：</strong> 练习 JavaScript 基础语法、类型判断与运算逻辑。</li>
+        <li><strong>JS对象：</strong> 掌握对象创建、属性方法、遍历与引用赋值。</li>
+        <li><strong>JS对象的应用：</strong> 使用对象组织学生信息与行为方法。</li>
+        <li><strong>JS函数：</strong> 使用函数拆分猜数字游戏逻辑。</li>
+        <li><strong>JS内部对象：</strong> 练习 Math、Date 与数组对象的使用。</li>
+        <li><strong>事件的冒泡与捕获：</strong> 理解 DOM 事件传播与监听机制。</li>
+        <li><strong>函数的三个方法应用：</strong> 结合抓小球游戏了解函数方法与事件监听。</li>
+      </ul>
+    </section>
+
+    <footer>
+      © 2026 周怡彤 · 高级网页设计课堂实践
+    </footer>
+  </div>
+</body>
+</html>
