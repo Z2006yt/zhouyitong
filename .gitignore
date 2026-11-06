@@ -16,3 +16,4 @@ bin-release/
 # Local excludes
 .trae/
 .trae-html-share-packages/
+debug.log
