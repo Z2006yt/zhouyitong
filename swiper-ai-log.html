@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<!--
+  作者: 周怡彤
+  建立时间: 2026-11-11
+  使用大模型: DeepSeek-V4.1-Flash
+  功能名称: Swiper 三次课作业 —— 提示词与 AI 对话记录（任务一 / 任务二 / 任务三 全过程留档）
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>提示词与 AI 对话记录 · 大国重器光影展（周怡彤）</title>
+<style>
+  :root{
+    --zyt_ink:#0f2b5b;
+    --zyt_blue:#1d5bbf;
+    --zyt_orange:#e8890c;
+    --zyt_bg:#f6f8fc;
+    --zyt_line:#e2e8f6;
+    --zyt_gray:#5b6675;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;background:var(--zyt_bg);color:#1f2937;line-height:1.75}
+  .zyt_wrap{max-width:960px;margin:0 auto;padding:40px 20px 70px}
+
+  /* zyt_head —— 周怡彤：页头 */
+  .zyt_head{background:linear-gradient(135deg,#0f2b5b,#1d5bbf);border-radius:20px;padding:34px 36px;color:#fff;box-shadow:0 12px 30px rgba(15,43,91,.28)}
+  .zyt_head .zyt_badge{display:inline-block;padding:5px 14px;border-radius:999px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);font-size:12.5px;letter-spacing:2px;margin-bottom:14px}
+  .zyt_head h1{font-size:27px;line-height:1.45;letter-spacing:.5px}
+  .zyt_head h1 b{color:#ffd166}
+  .zyt_head p{margin-top:12px;font-size:14px;color:#d9e3f5;line-height:1.95}
+  .zyt_meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+  .zyt_meta span{font-size:12.5px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.26);padding:5px 13px;border-radius:8px}
+
+  /* zyt_nav —— 周怡彤：锚点导航 */
+  .zyt_nav{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 8px}
+  .zyt_nav a{text-decoration:none;font-size:13.5px;color:var(--zyt_blue);background:#fff;border:1px solid var(--zyt_line);border-radius:999px;padding:8px 18px;transition:all .2s}
+  .zyt_nav a:hover{background:var(--zyt_blue);color:#fff;border-color:transparent;transform:translateY(-2px)}
+
+  /* zyt_card —— 周怡彤：任务区块 */
+  .zyt_card{background:#fff;border:1px solid var(--zyt_line);border-radius:18px;padding:26px 28px;margin-top:22px;box-shadow:0 4px 14px rgba(31,41,55,.05);position:relative;overflow:hidden}
+  .zyt_card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(#0f2b5b,#1d5bbf)}
+  .zyt_card.zyt_task2::before{background:linear-gradient(#e8890c,#f6b23c)}
+  .zyt_card.zyt_task3::before{background:linear-gradient(#15803d,#34a853)}
+  .zyt_card h2{font-size:19px;color:var(--zyt_ink);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .zyt_card h2 em{font-style:normal;font-size:12px;font-weight:normal;color:#fff;background:var(--zyt_blue);border-radius:6px;padding:2px 9px}
+  .zyt_task2 h2 em{background:var(--zyt_orange)}
+  .zyt_task3 h2 em{background:#15803d}
+  .zyt_card h3{font-size:15px;color:#213047;margin:20px 0 8px;padding-left:9px;border-left:3px solid var(--zyt_blue)}
+  .zyt_card p{font-size:14.2px;color:#374151;margin-top:8px}
+  .zyt_card code{background:#eef2ff;color:#1d4ed8;padding:1px 6px;border-radius:5px;font-family:Consolas,monospace;font-size:12.8px;word-break:break-all}
+
+  /* zyt_prompt / zyt_answer —— 周怡彤：提示词与 AI 回答对照 */
+  .zyt_prompt,.zyt_answer{border-radius:12px;padding:14px 18px;margin-top:10px;font-size:13.8px;line-height:1.95;white-space:pre-wrap;word-break:break-word}
+  .zyt_prompt{background:#eff6ff;border:1px solid #bfdbfe;color:#1e3a8a;position:relative}
+  .zyt_answer{background:#f8fafc;border:1px solid #e2e8f0;color:#334155;font-family:Consolas,"Microsoft YaHei",monospace;font-size:13px}
+  .zyt_prompt::before{content:"我 · 提示词";position:absolute;top:-11px;left:14px;background:#1d5bbf;color:#fff;font-size:11.5px;padding:1px 10px;border-radius:999px;letter-spacing:.5px}
+  .zyt_answer::before{content:"AI · 回答";position:absolute;top:-11px;left:14px;background:#64748b;color:#fff;font-size:11.5px;padding:1px 10px;border-radius:999px;letter-spacing:.5px}
+  .zyt_answer{position:relative;margin-top:22px}
+  .zyt_prompt{margin-top:22px}
+
+  /* zyt_verdict —— 周怡彤：验证结论条 */
+  .zyt_verdict{margin-top:16px;background:#f0fdf4;border:1.5px dashed #16a34a;border-radius:12px;padding:13px 18px;font-size:13.8px;color:#166534;line-height:1.95}
+  .zyt_verdict b{color:#15803d}
+  .zyt_verdict.bad{background:#fff7ed;border-color:#fb923c;color:#9a3412}
+  .zyt_verdict.bad b{color:#c2410c}
+
+  /* zyt_table —— 周怡彤：答辩速查表 */
+  .zyt_table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13.8px}
+  .zyt_table th,.zyt_table td{border:1px solid var(--zyt_line);padding:10px 13px;text-align:left;vertical-align:top}
+  .zyt_table th{background:#f3f6fd;color:var(--zyt_ink);font-size:13.5px;white-space:nowrap}
+  .zyt_table td code{font-size:12.5px}
+
+  /* zyt_figure —— 周怡彤：验证截图 */
+  .zyt_figure{margin-top:14px;border:1px solid var(--zyt_line);border-radius:12px;overflow:hidden;background:#fff}
+  .zyt_figure img{display:block;width:100%;height:auto}
+  .zyt_figure figcaption{font-size:12.5px;color:var(--zyt_gray);padding:9px 14px;background:#f8fafc;border-top:1px solid var(--zyt_line);line-height:1.8}
+
+  .zyt_back{text-align:center;margin-top:30px}
+  .zyt_back a{display:inline-block;text-decoration:none;color:var(--zyt_ink);font-size:14px;font-weight:bold;background:#fff;border:1px solid #dbe4ff;border-radius:999px;padding:10px 24px;margin:0 5px;transition:all .2s}
+  .zyt_back a:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(15,43,91,.15)}
+  footer{text-align:center;margin-top:30px;color:#9ca3af;font-size:12.5px;line-height:2}
+</style>
+</head>
+<body>
+<div class="zyt_wrap">
+
+  <header class="zyt_head">
+    <span class="zyt_badge">高 级 网 页 设 计 · 三 次 课 作 业</span>
+    <h1>Swiper 提示词与 AI 对话记录 · <b>周怡彤</b></h1>
+    <p>本页是三次课三大任务的<b>过程留档</b>：每一条提示词、AI 每一轮回答、我自己的验证结论都原样保留，方便老师抽查答辩时逐条对账。</p>
+    <div class="zyt_meta">
+      <span>姓名：周怡彤</span>
+      <span>学号：24002120118</span>
+      <span>使用大模型：DeepSeek-V4.1-Flash</span>
+      <span>建立时间：2026-11-11</span>
+    </div>
+  </header>
+
+  <nav class="zyt_nav">
+    <a href="#zyt_task1">任务一 · 提示词工程师</a>
+    <a href="#zyt_task2">任务二 · creative 电影墙</a>
+    <a href="#zyt_task3">任务三 · 综合创作 + 超纲</a>
+    <a href="#zyt_defense">答辩速查</a>
+    <a href="swiper-task.html">← 回到作品页</a>
+  </nav>
+
+  <!-- ═══════════════ 任务一 ═══════════════ -->
+  <section class="zyt_card" id="zyt_task1">
+    <h2><em>任务一 ★★</em> 提示词工程师：让 AI 听懂需求</h2>
+    <p>需求原文：<b>①</b> 无缝隙循环；<b>②</b> 3.2 秒自动翻页且手动操作后不停止；<b>③</b> 圆点分页器可点击；<b>④</b> 初始效果为 cube。目标产物是 <code>new Swiper('#mySwi4', {...})</code> 的配置对象。</p>
+
+    <h3>第 1 轮提示词（先说个"大概"，故意留坑）</h3>
+    <div class="zyt_prompt">帮我写一个 Swiper 初始化代码，容器 id 是 mySwi4，要循环，自动播放 3.2 秒，加圆点分页，初始效果用立方体。</div>
+
+    <div class="zyt_answer">new Swiper('#mySwi4', {
+  loop: true,
+  autoplay: 3200,
+  effect: 'cube',
+  pagination: { el: '.swiper-pagination' }
+});</div>
+
+    <div class="zyt_verdict bad">
+      <b>第 1 轮验证：两条需求没达标。</b>
+      把答案贴进页面后发现：① 我用手拖了一下再松手，轮播就<b>停住不自动翻了</b>；② 圆点虽然出现了，但<b>点了没反应</b>。
+      回头比对需求才发现——<b>我的第一版提示词漏掉了"手动操作后不停止"和"圆点可点击"这两条，只说了"加圆点分页"</b>；
+      而 AI 又照着 Swiper 6 的老写法给了 <code>autoplay: 3200</code> 这种数字简写，Swiper 11 里它没法带 <code>disableOnInteraction</code>，默认就是"用户一交互就停"。
+    </div>
+
+    <h3>第 2 轮提示词（把漏掉的"说清楚"，并指定 API 版本与写法）</h3>
+    <div class="zyt_prompt">上一版有两个问题，请按 Swiper 11 的对象写法重写：
+1）autoplay 必须是对象，delay 3200，并且用户拖动或点击之后自动播放不能停止（disableOnInteraction: false）；
+2）pagination 的圆点必须能点击跳转，要写 clickable: true，el 用 '#mySwi4 .swiper-pagination' 明确归属；
+3）loop: true 保持不变，effect 初始为 'cube'，并补上 cubeEffect 的默认阴影参数；
+4）不要写多余的 CSS 或 HTML，只给我 new Swiper 的配置对象。</div>
+
+    <div class="zyt_answer">new Swiper('#mySwi4', {
+  loop: true,                          // ① 无缝隙循环
+  autoplay: {
+    delay: 3200,                       // ② 3.2 秒翻一页
+    disableOnInteraction: false,       // ② 手动操作后继续自动播放
+  },
+  pagination: {
+    el: '#mySwi4 .swiper-pagination',
+    clickable: true,                   // ③ 圆点可点击跳转
+  },
+  effect: 'cube',                      // ④ 初始 cube
+  cubeEffect: {
+    shadow: true,
+    slideShadows: true,
+    shadowOffset: 24,
+    shadowScale: 0.92,
+  },
+  speed: 800,
+});</div>
+
+    <div class="zyt_verdict">
+      <b>第 2 轮验证结论（一句话）：</b>配置原样贴进页面后，刷新即自动以立方体翻转、每 3.2 秒一页、手动拖完松手继续自动播放、点第 5 个圆点能直接跳过去、第 6 张之后无缝回到第 1 张 —— <b>四条需求全部通过</b>。
+      验证现场就是作品页里的「演示五 · 提示词验证台」。
+    </div>
+
+    <figure class="zyt_figure">
+      <img src="swiper-shots/demo5-verify.png" alt="演示五提示词验证台实测截图">
+      <figcaption>实测截图（Edge 无头浏览器抓取）：作品页「演示五 · 提示词验证台」，<code>#zyt_mySwi4</code> 以 cube 效果运行，四条需求逐条对照可见。点击可跳到 <a href="swiper-task.html#zyt_sec_verify" style="color:#1d5bbf">作品页对应区块</a>。</figcaption>
+    </figure>
+  </section>
+
+  <!-- ═══════════════ 任务二 ═══════════════ -->
+  <section class="zyt_card zyt_task2" id="zyt_task2">
+    <h2><em>任务二 ★★</em> creative 仿写：课堂没讲的第 7 种效果</h2>
+    <p>课堂只讲了 slide / fade / cube / coverflow / flip / cards 六种，第 7 种是 <code>creative</code>（自定义变换）。我先读了本地官方示例 <code>swiper/demo/257-effect-creative.html</code>，再让 AI 帮我读懂 <code>creativeEffect</code> 的写法。</p>
+
+    <h3>提示词（带着官方示例去问）</h3>
+    <div class="zyt_prompt">官方示例 257-effect-creative.html 里有 6 个 creativeEffect 配置，其中 prev 写的是 translate: [0,0,-400]，next 写的是 translate: ['100%',0,0]。
+请解释：
+1）prev 和 next 这两个 transform 分别控制哪一张幻灯片？
+2）translate 数组三个值分别是什么轴？
+3）我要做"电影选片墙"：上一张缩小、往左移、并且带一点角度；下一张放大、从右边推进来。请给我一组合适参数，并说明每个参数的作用。
+4）transform 里的百分号是相对于谁的？</div>
+
+    <div class="zyt_answer">1）prev 控制"已经翻过去、停在左边的那张"，next 控制"还没进场、等在右边的那张"，正在播放的 active 那张永远在原点。
+2）translate: [x, y, z] —— x 左右、y 上下、z 前后（负值后退，看起来变小）。
+3）电影墙参数建议：
+   prev: { translate: ['-45%',0,-180], rotate: [0,0,8], scale: 0.82, opacity: .65, shadow: true }
+   next: { translate: ['100%',0,0], scale: 1.15, opacity: .9, shadow: true }
+   —— 上一张左移 45%、后退 180px（视觉变小）、绕 Z 轴倾斜 8°；下一张停在右侧画面外，带 1.15 倍放大推进来，形成"推向观众"的纵深感。
+4）百分号是相对于幻灯片自身尺寸（swiper-slide 的宽/高），不是相对于外层容器。</div>
+
+    <h3>追问：把角度改成 20 度会怎样？</h3>
+    <div class="zyt_prompt">你的参数里 rotate: [0,0,8] 是 8 度。如果我把最后一个值改成 20，页面上会看到什么变化？为什么是数组第三个值而不是第一个？</div>
+    <div class="zyt_answer">数组是 [rotateX, rotateY, rotateZ]。第三个值对应 rotateZ，也就是在屏幕平面内顺时针旋转，所以 8 → 20 后上一张卡片的倾斜角从 8° 变成 20°，斜得更明显（超过约 15° 就开始显得"歪"，20° 已经有明显的斜插感，如果不想要这种效果就调回 8~12°）。
+想看"卡片立起来"的效果则要改第一个值 rotateX，改第二个值 rotateY 会得到绕垂直轴翻的 3D 效果。</div>
+
+    <div class="zyt_verdict">
+      <b>验证结论（一句话）：</b>点作品页「演示四」第 7 个按钮「creative 电影墙」后，上一张确实缩小左移并带 8° 斜角、下一张放大从右侧推进落位；把 rotate 第三个值改成 20 再试，斜角明显变大，与预期一致。
+    </div>
+
+    <figure class="zyt_figure">
+      <img src="swiper-shots/demo4-effects.png" alt="演示四七个效果按钮截图">
+      <figcaption>实测截图：演示四共 7 个效果按钮，第 7 个即新增的「creative 电影墙（第 7 种·课堂未讲）★」，下方附 creative 参数拆解。点击可跳到 <a href="swiper-task.html#zyt_sec_fx4" style="color:#1d5bbf">作品页对应区块</a>。</figcaption>
+    </figure>
+
+    <h3>我自己的话总结（答辩用）</h3>
+    <table class="zyt_table">
+      <tr><th>参数</th><th>它控制什么</th></tr>
+      <tr><td><code>prev.translate</code></td><td>已经翻过去那张的位移：负 x 往左、负 z 后退（视觉变小）</td></tr>
+      <tr><td><code>prev.rotate</code> / <code>scale</code></td><td>那张的倾斜角度与缩放比例</td></tr>
+      <tr><td><code>next.translate</code></td><td>还没进场那张的位置：<code>'100%'</code> 表示刚好停在右侧画面之外</td></tr>
+      <tr><td><code>next.scale</code></td><td>进场前的放大倍数，1.15 让它"冲向观众"再落位</td></tr>
+      <tr><td><code>limitProgress</code></td><td>往两侧最多叠加几张（2 表示只留两张，像选片墙）</td></tr>
+    </table>
+  </section>
+
+  <!-- ═══════════════ 任务三 ═══════════════ -->
+  <section class="zyt_card zyt_task3" id="zyt_task3">
+    <h2><em>任务三 ★★★</em> 综合创作 + 技术答辩</h2>
+
+    <h3>① 第六件展品「爱达·魔都号」—— AI 生成横版 16:9 图片</h3>
+    <p>提示词（用于文生图，中文需求 → 英文描述，明确写死 16:9 与"无文字水印"）：</p>
+    <div class="zyt_prompt">Website hero banner photo for a Chinese science-and-technology exhibition gallery: a massive modern luxury cruise ship sailing on calm blue ocean at golden hour dusk, white hull with colorful abstract art livery on the bow, multi-deck superstructure with rows of glowing windows, bow wave with white foam, dramatic clouds and warm sunset light on the horizon, shot from a low aerial three-quarter angle, photorealistic, ultra detailed, cinematic wide composition, 16:9 landscape, no text no watermark</div>
+    <div class="zyt_verdict">
+      <b>结果：</b>生成横版 16:9 图片一张（2560×1440），已存为 <code>swiper-imgs/aida_modu.jpg</code>；
+      slide 结构完整（图片 + 标题 + 一句说明），五个轮播全部补为 6 张，与原有五件展品风格统一。
+    </div>
+
+    <figure class="zyt_figure">
+      <img src="swiper-imgs/aida_modu.jpg" alt="爱达·魔都号 AI 生成图">
+      <figcaption>AI 生成的第六件展品图片（2560×1440，16:9），已落地为 <code>swiper-imgs/aida_modu.jpg</code>，五个演示台的第 6 张幻灯片都用它。</figcaption>
+    </figure>
+
+    <h3>② 超纲能力：keyboard 键盘控制（课堂没讲过）</h3>
+    <div class="zyt_prompt">Swiper 11 里怎么加键盘控制？我要在这个页面的演示二上加：点击轮播后按 ← → 能翻页，但页面别的地方按方向键不能误触发。请只给配置对象，并说明每个参数。</div>
+    <div class="zyt_answer">在初始化配置里加：
+keyboard: {
+  enabled: true,          // 开启键盘控制
+  onlyInViewport: true,   // 只有轮播在视口内才响应，页面别处按方向键不会误翻
+}
+注意：键盘事件是绑在 swiper 容器上的，容器需要能获得焦点。Swiper 11 的 a11y 模块会自动给容器补 tabindex="0"，
+所以用户点一下轮播之后按 ← → / PageUp / PageDown 就能翻页。</div>
+
+    <div class="zyt_verdict">
+      <b>验证结论（一句话）：</b>点一下演示二再按 → 能切到下一张、按 ← 回到上一张，且页面滚动到下方其它区块后按方向键不会误翻 —— 通过。
+    </div>
+
+    <h3>答辩四连问 · 我的回答</h3>
+    <table class="zyt_table">
+      <tr><th>问题</th><th>我的回答</th></tr>
+      <tr>
+        <td>这段代码什么意思？</td>
+        <td><code>keyboard.enabled</code> 打开键盘模块，把方向键与 Swiper 的 prev/next 绑定；<code>onlyInViewport: true</code> 让它在不在视口内时不响应，避免影响整页滚动与其它交互。</td>
+      </tr>
+      <tr>
+        <td>AI 第一次给的哪里不对，你改了什么？</td>
+        <td>AI 第一次给的是 <code>keyboard: true</code>（Swiper 5/6 的旧写法），Swiper 11 需要对象写法，直接这样写不生效；另外它没提醒"要先让容器获得焦点"。我改成对象写法并补上了 <code>onlyInViewport</code>，同时在页面上加了"先点一下轮播"的提示。</td>
+      </tr>
+      <tr>
+        <td>新参数的作用？</td>
+        <td><code>onlyInViewport</code>：只有轮播出现在视口内时才响应键盘，防止用户在页面别处按方向键把看不见的轮播翻掉；<code>enabled</code>：总开关。</td>
+      </tr>
+      <tr>
+        <td>现场把 delay 改成指定值，解释预期变化</td>
+        <td>把演示五（或演示四）的 <code>autoplay.delay</code> 从 3200 改成 1500：翻页间隔从 3.2 秒缩短到 1.5 秒，节奏明显变快；因为 <code>disableOnInteraction: false</code> 没变，手动拖动后仍会继续按 1.5 秒自动翻。改成 0 或负数则自动播放会立即连续触发，几乎无法看清画面。</td>
+      </tr>
+    </table>
+  </section>
+
+  <!-- ═══════════════ 答辩速查 ═══════════════ -->
+  <section class="zyt_card" id="zyt_defense">
+    <h2><em>速查</em> 三个任务的关键参数一览</h2>
+    <table class="zyt_table">
+      <tr><th>任务</th><th>关键代码</th><th>一句话作用</th></tr>
+      <tr><td>任务一 ①</td><td><code>loop: true</code></td><td>最后一张之后无缝接回第一张</td></tr>
+      <tr><td>任务一 ②</td><td><code>autoplay: { delay: 3200, disableOnInteraction: false }</code></td><td>3.2 秒自动翻页，手动操作后不停</td></tr>
+      <tr><td>任务一 ③</td><td><code>pagination: { el, clickable: true }</code></td><td>圆点可点击跳转</td></tr>
+      <tr><td>任务一 ④</td><td><code>effect: 'cube'</code></td><td>初始立方体效果</td></tr>
+      <tr><td>任务二</td><td><code>effect: 'creative'</code> + <code>creativeEffect.prev / .next</code></td><td>自定义上一张 / 下一张的位移、角度、缩放</td></tr>
+      <tr><td>任务三 ①</td><td>AI 生图 + 完整 slide 结构</td><td>第六件展品「爱达·魔都号」</td></tr>
+      <tr><td>任务三 ②</td><td><code>keyboard: { enabled: true, onlyInViewport: true }</code></td><td>键盘 ← → 翻页，仅视口内生效</td></tr>
+    </table>
+  </section>
+
+  <div class="zyt_back">
+    <a href="swiper-task.html">← 返回作品页（大国重器光影展）</a>
+    <a href="index.html">返回课堂实践中心 →</a>
+  </div>
+
+  <footer>高级网页设计 · 三次课作业 · 周怡彤 24002120118 · 2026-11-11</footer>
+</div>
+</body>
+</html>
