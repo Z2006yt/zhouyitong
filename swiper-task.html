@@ -2,18 +2,26 @@
 <!--
   作者: 周怡彤
   建立时间: 2026-11-06
-  最后修改: 2026-11-11
+  最后修改: 2026-11-11（三次课作业：在原 4 个演示台基础上新增演示五与三项作业内容）
   使用大模型: DeepSeek-V4.1-Flash
-  功能名称: Swiper 轮播课堂作业 —— 大国重器光影展（六件展品 / 七种效果 / 键盘控制 / 提示词验证台）
+  功能名称: Swiper 轮播课堂作业 —— 大国重器光影展（新增：第六件展品 / creative 电影墙 / 键盘控制 / 提示词验证台）
 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Swiper 课堂操作任务 · 大国重器光影展 · 补全 JS</title>
-<!-- zyt_lib —— 周怡彤：改用项目内本地 Swiper 11 组件库，断网也能演示 -->
+<!-- Swiper 官方组件库已通过 CDN 引入好，学生只需在底部 <script> 中写初始化代码 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+<script src=" https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<!-- zyt_cdn-fallback —— 周怡彤：上面两行原始 CDN 引入保持不动；校园网/断网时 CDN 拿不到，这里兜底加载本地同版本 Swiper 11，保证页面照样能动 -->
 <link rel="stylesheet" href="swiper/swiper-bundle.min.css">
-<script src="swiper/swiper-bundle.min.js"></script>
+<script>
+  // 功能: 检测 CDN 版 Swiper 是否加载成功，未成功则同步载入本地同版本库（离线兜底）
+  if (typeof Swiper === "undefined") {
+    document.write('<script src="swiper/swiper-bundle.min.js"><\/script>');
+  }
+</script>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
   body{font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;background:#f6f8fc;color:#1f2937}
@@ -82,7 +90,8 @@
   }
   .wy-fx button:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(29,91,191,.18)}
   .wy-fx button.wy-on{background:linear-gradient(135deg,#0f2b5b,#1d5bbf);color:#fff;border-color:transparent}
-  /* zyt_fx-note —— 周怡彤：新增效果 / 超纲能力的说明条 */
+
+  /* zyt_fx-note —— 周怡彤：新增效果 / 超纲能力的说明条（三次课作业新增） */
   .zyt_fx-note{margin-top:12px;font-size:13.2px;color:#3f4a5a;background:#f3f6fd;border-left:3px solid #1d5bbf;border-radius:0 8px 8px 0;padding:9px 14px;line-height:1.95}
   .zyt_fx-note b{color:#0f2b5b}
   .zyt_fx-note a{color:#1d5bbf;font-weight:bold}
@@ -110,25 +119,25 @@
     <h1>Swiper 轮播组件 · <b>大国重器光影展（学生版）</b></h1>
     <p>HTML 骨架和 CSS 样式已经全部搭好，图片也备齐了——但这个页面的轮播<b>一个都不会动</b>！
     因为所有 <b>&lt;script&gt; 里的 JS 初始化代码都被抽走了</b>。你的任务：把 4 个轮播全部"救活"。</p>
-    <div class="wy-goals"><i>任务 1 · 救活最小轮播</i><i>任务 2 · 装上圆点和箭头</i><i>任务 3 · 让它自己翻页</i><i>任务 4 · 六种效果随心换</i><i>任务 5 · 提示词验证台 ★</i></div>
+    <div class="wy-goals"><i>任务 1 · 救活最小轮播</i><i>任务 2 · 装上圆点和箭头</i><i>任务 3 · 让它自己翻页</i><i>任务 4 · 六种效果随心换</i></div>
   </div>
 
   <div class="wy-rule">
-    <b>◆ 任务说明（先读再动手）：</b><br>
-    ① Swiper 组件库已在页面第 15、16 行引入（项目内本地文件 <code>swiper/swiper-bundle.min.*</code>），<b>不需要</b>再写引入代码；<br>
+    <b>[表情] 任务说明（先读再动手）：</b><br>
+    ① Swiper 组件库已通过 CDN 引入（页面第 8、9 行），<b>不需要</b>再写引入代码；<br>
     ② 每个"演示台"下面的绿色卡片就是该任务的要求，JS 代码统一写在页面最底部的 <code>&lt;script&gt;</code> 区域内；<br>
     ③ 每完成一个任务就<b>刷新页面验证</b>：能拖、能点、会自己翻，才算通过；<br>
     ④ 控制台（F12）报错是你要最好的朋友——先读报错，再改代码。
   </div>
 
-  <!-- zyt_task-bar —— 周怡彤：三次课三大任务索引（2026-11-11 提交） -->
+  <!-- zyt_task-bar —— 周怡彤：三次课三大任务索引（2026-11-11 提交，原有 4 个演示台全部保留） -->
   <div class="zyt_task-bar">
     <b>📌 三次课三大任务（2026-11-11 提交 GitHub）：</b><br>
-    <b>任务一 · 提示词工程师</b> —— 四条需求 → 两轮提示词 → 答案贴回页面验证，见「演示五 · 提示词验证台」，完整对话见
+    <b>任务一 · 提示词工程师</b> —— 四条需求 → 两轮提示词 → 答案贴回页面验证，见新增的「演示五 · 提示词验证台」，完整对话见
     <a href="swiper-ai-log.html">提示词与 AI 对话记录 →</a><br>
-    <b>任务二 · creative 电影墙</b> —— 课堂未讲的第 7 种效果，见「演示四」第 7 个按钮
+    <b>任务二 · creative 电影墙</b> —— 课堂未讲的第 7 种效果，见「演示四」新增的第 7 个按钮
     <code>creative 电影墙</code><br>
-    <b>任务三 · 综合创作 + 超纲能力</b> —— 第六件展品「爱达·魔都号」（AI 生成横版 16:9）+ 超纲能力
+    <b>任务三 · 综合创作 + 超纲能力</b> —— 第六件展品「爱达·魔都号」（AI 生成横版 16:9，五个演示台都已补上）+ 超纲能力
     <code>keyboard 键盘控制</code>（演示二）
   </div>
 
@@ -140,12 +149,12 @@
     </div>
     <p class="wy-txt">下面是"最小轮播"骨架：三层结构齐全，但因为没有初始化，照片<b>僵在第一张</b>。请写出初始化代码，让它至少<b>可以按住拖动</b>。</p>
     <div class="wy-req">
-      <h3>◆ 任务 1 要求</h3>
+      <h3>[表情] 任务 1 要求</h3>
       <p>在页面底部 <code>&lt;script&gt;</code> 中初始化 <code>#wySw1</code>，让它成为可拖动的轮播（最基础写法，一个空配置对象即可）。</p>
-      <span class="wy-star">◆ 验证标准：按住鼠标左右拖动，照片能跟着手走</span>
+      <span class="wy-star">[表情] 验证标准：按住鼠标左右拖动，照片能跟着手走</span>
     </div>
     <div class="wy-demo">
-      <span class="wy-demo-tag">◆ 演示一 · 最小轮播（救活后按住拖一拖）</span>
+      <span class="wy-demo-tag">[表情] 演示一 · 最小轮播（救活后按住拖一拖）</span>
       <div class="wy-swiper">
         <div class="swiper" id="wySw1">
           <div class="swiper-wrapper">
@@ -170,12 +179,12 @@
     </div>
     <p class="wy-txt">HTML 里已经埋好了三个"遥控器"元素：<code>#wyPag2</code>（圆点）、<code>#wyPrev2</code> / <code>#wyNext2</code>（左右箭头）。请通过配置让它们"通电"。</p>
     <div class="wy-req">
-      <h3>◆ 任务 2 要求</h3>
+      <h3>[表情] 任务 2 要求</h3>
       <p>初始化 <code>#wySw2</code>，实现 4 个效果：<b>① 无缝循环</b>（loop）<b>② 切换动画时长 600 毫秒</b>（speed）<b>③ 圆点分页器且可点击跳转</b>（pagination，别漏 el）<b>④ 两侧箭头可切换</b>（navigation）。</p>
-      <span class="wy-star">◆ 验证标准：点圆点能跳转、点箭头能翻页、最后一张继续往后翻会回到第一张</span>
+      <span class="wy-star">[表情] 验证标准：点圆点能跳转、点箭头能翻页、最后一张继续往后翻会回到第一张</span>
     </div>
     <div class="wy-demo">
-      <span class="wy-demo-tag">◆ 演示二 · 圆点可点 + 箭头可切 + 键盘可翻</span>
+      <span class="wy-demo-tag">[表情] 演示二 · 圆点可点 + 箭头可切</span>
       <div class="wy-swiper">
         <div class="swiper" id="wySw2">
           <div class="swiper-wrapper">
@@ -192,13 +201,13 @@
           <div class="swiper-button-next" id="wyNext2"></div>
         </div>
       </div>
-      <!-- zyt_kbd-note —— 周怡彤：任务三超纲能力说明（keyboard 键盘控制） -->
+      <!-- zyt_kbd-note —— 周怡彤：任务三超纲能力说明（keyboard 键盘控制，新增） -->
       <div class="zyt_fx-note">
-        <b>超纲能力 · keyboard 键盘控制</b>（任务三 ②）：先用鼠标<b>点击一次轮播</b>让它获得焦点，再按
+        <b>超纲能力 · keyboard 键盘控制</b>（任务三 ②，课堂没讲过）：先用鼠标<b>点击一次轮播</b>让它获得焦点，再按
         <span class="zyt_kbd">←</span><span class="zyt_kbd">→</span> 即可翻页；按
         <span class="zyt_kbd">PageUp</span>/<span class="zyt_kbd">PageDown</span> 同样有效。
-        课堂上没讲过这个模块，它由 <code>keyboard.enabled</code> 开启，Swiper 11 的 a11y 模块会顺手给容器加上
-        <code>tabindex="0"</code>，这样才能接收键盘事件。
+        它由 <code>keyboard.enabled</code> 开启，Swiper 11 的 a11y 模块会顺手给容器加上
+        <code>tabindex="0"</code>，容器能获得焦点才能接收键盘事件。
       </div>
     </div>
   </div>
@@ -211,12 +220,12 @@
     </div>
     <p class="wy-txt">网页 Banner 最常见的形态：<b>自己会翻页</b>。<code>autoplay.delay</code> 控制每张停留的毫秒数，<code>disableOnInteraction: false</code> 表示用户手动滑动之后自动播放<b>不停止</b>。</p>
     <div class="wy-req">
-      <h3>◆ 任务 3 要求</h3>
+      <h3>[表情] 任务 3 要求</h3>
       <p>初始化 <code>#wySw3</code>，实现：<b>① 循环播放</b> <b>② 每 2.6 秒自动翻页</b> <b>③ 用户拖动之后自动播放继续</b> <b>④ 保留底部圆点分页器（#wyPag3）</b>。</p>
-      <span class="wy-star">◆ 验证标准：什么都不做它会自己翻；拖一下松手后，它还能接着自动翻</span>
+      <span class="wy-star">[表情] 验证标准：什么都不做它会自己翻；拖一下松手后，它还能接着自动翻</span>
     </div>
     <div class="wy-demo">
-      <span class="wy-demo-tag">◆ 演示三 · 每 2.6 秒自动翻页（救活后什么都不用做，看着就行）</span>
+      <span class="wy-demo-tag">[表情] 演示三 · 每 2.6 秒自动翻页（救活后什么都不用做，看着就行）</span>
       <div class="wy-swiper">
         <div class="swiper" id="wySw3">
           <div class="swiper-wrapper">
@@ -235,17 +244,17 @@
   </div>
 
   <!-- 任务 4 -->
-  <div class="wy-sec" id="zyt_sec_fx4">
+  <div class="wy-sec">
     <div class="wy-sec-head">
       <span class="wy-no">4</span>
       <h2>六种效果随心换<small>effect 参数 + 进阶：按钮实时切换</small></h2>
     </div>
     <p class="wy-txt">改一个 <code>effect</code> 参数，轮播立刻换一种"性格"：slide / fade / cube / coverflow / flip / cards。上面的 6 个按钮已经绑好了点击事件（读取 <code>btn.dataset.fx</code>），JS 还需要你补两段。</p>
     <div class="wy-req">
-      <h3>◆ 任务 4 要求</h3>
+      <h3>[表情] 任务 4 要求</h3>
       <p><b>基础分</b>：初始化 <code>#wySw4</code>，实现循环 + 自动播放（3.2 秒）+ 圆点分页器（#wyPag4），初始效果为 <code>'slide'</code>，动画时长 800 毫秒。</p>
       <p><b>进阶分</b>：补全按钮点击事件中的 TODO——实现点击按钮<b>切换效果</b>。提示：Swiper 动态换 effect 不能只改参数，需要<b>先销毁旧实例再重建</b>（destroy + new）。</p>
-      <span class="wy-star">◆ 验证标准：基础分——轮播自动翻页；进阶分——点 cube 按钮变 3D 立方体、点 fade 变淡入淡出</span>
+      <span class="wy-star">[表情] 验证标准：基础分——轮播自动翻页；进阶分——点 cube 按钮变 3D 立方体、点 fade 变淡入淡出</span>
     </div>
     <div class="wy-fx">
       <button class="wy-on" data-fx="slide">slide 平推（默认·稳重）</button>
@@ -254,11 +263,11 @@
       <button data-fx="coverflow">coverflow 画廊堆叠（沉浸）</button>
       <button data-fx="flip">flip 翻页（复古）</button>
       <button data-fx="cards">cards 卡片（俏皮）</button>
-      <!-- zyt_fx7 —— 周怡彤：任务二新增第 7 个按钮，effect: "creative" -->
+      <!-- zyt_fx7 —— 周怡彤：任务二新增第 7 个按钮，effect: "creative"（课堂未讲） -->
       <button data-fx="creative">creative 电影墙（第 7 种·课堂未讲）★</button>
     </div>
     <div class="wy-demo">
-      <span class="wy-demo-tag">◆ 演示四 · 效果实验台（点按钮切换 effect）</span>
+      <span class="wy-demo-tag">[表情] 演示四 · 效果实验台（点按钮切换 effect）</span>
       <div class="wy-swiper">
         <div class="swiper" id="wySw4">
           <div class="swiper-wrapper">
@@ -273,16 +282,18 @@
           <div class="swiper-pagination" id="wyPag4"></div>
         </div>
       </div>
-      <!-- zyt_creative-note —— 周怡彤：任务二 creative 电影墙参数说明 -->
+      <!-- zyt_creative-note —— 周怡彤：任务二 creative 电影墙参数说明（新增） -->
       <div class="zyt_fx-note">
-        <b>第 7 种效果 · creative（自定义变换）</b>：点「creative 电影墙」按钮后，<b>上一张</b>会缩小左移、逆时针倾斜 8° 并后退（<code>translate:['-45%',0,-180]</code> + <code>rotate:[0,0,8]</code> + <code>scale:0.82</code>），
-        <b>下一张</b>则从右侧放大推进落位（<code>translate:['100%',0,0]</code> + <code>scale:1.15</code>），像在电影选片墙上抽走一张、推进一张。
+        <b>第 7 种效果 · creative（自定义变换）</b>：点「creative 电影墙」后，<b>上一张</b>缩小左移、逆时针倾斜 8° 并后退
+        （<code>translate:['-45%',0,-180]</code> + <code>rotate:[0,0,8]</code> + <code>scale:0.82</code>），
+        <b>下一张</b>从右侧放大推进落位（<code>translate:['100%',0,0]</code> + <code>scale:1.15</code>），
+        像在电影选片墙上抽走一张、推进一张。
         <code>prev</code> / <code>next</code> 的 transform 分别描述"已经翻过去那张"和"还没进场那张"的位移 / 角度 / 缩放，<b>正在播放的那张永远是原点</b>。
       </div>
     </div>
   </div>
 
-  <!-- 任务一 · 提示词验证台（三次课作业） -->
+  <!-- 新增：任务一 · 提示词验证台（三次课作业，原有 4 个演示台保持不变） -->
   <div class="wy-sec" id="zyt_sec_verify">
     <div class="wy-sec-head">
       <span class="wy-no">5</span>
@@ -290,12 +301,12 @@
     </div>
     <p class="wy-txt">这一台<b>不是手写的</b>：配置是把下面四条需求"翻译"给 AI 之后，把<b>第二轮答案原样贴进页面</b>的结果。要求逐条验证，不许凭感觉说"应该没问题"。</p>
     <div class="wy-req">
-      <h3>◆ 任务一 四条需求</h3>
+      <h3>[表情] 任务一 四条需求</h3>
       <p><b>①</b> 无缝隙循环（loop）　<b>②</b> 3.2 秒自动翻页，且手动操作后<b>不停止</b>自动播放　<b>③</b> 圆点分页器<b>可点击</b>　<b>④</b> 初始效果为 <code>cube</code></p>
-      <span class="wy-star">◆ 验证方式：刷新后看它是否自己翻（②）、点圆点是否跳转（③）、立方体是否转起来（④）、第 6 张能否绕回第 1 张（①）</span>
+      <span class="wy-star">[表情] 验证方式：刷新后看它是否自己翻（②）、点圆点是否跳转（③）、立方体是否转起来（④）、第 6 张能否绕回第 1 张（①）</span>
     </div>
     <div class="wy-demo">
-      <span class="wy-demo-tag">🧪 演示五 · AI 第二轮答案上线（#zyt_mySwi4 · cube · 3.2s · loop · 圆点可点）</span>
+      <span class="wy-demo-tag">[表情] 演示五 · AI 第二轮答案上线（#zyt_mySwi4 · cube · 3.2s · loop · 圆点可点）</span>
       <div class="wy-swiper">
         <div class="swiper" id="zyt_mySwi4">
           <div class="swiper-wrapper">
@@ -323,117 +334,133 @@
 
 <script>
   // ══════════════════════════════════════════════════════════
-  //  学生作答区 —— 作者：周怡彤（2026-11-11 完成三次课三大任务）
-  //  命名规范：本区所有 JS 变量一律以 zyt_ 开头
+  //  [表情] 学生作答区：把 4 个轮播全部救活（参考各演示台上方的绿色任务卡）
   // ══════════════════════════════════════════════════════════
 
-  // zyt_sw1 —— 功能：初始化演示一最小轮播，空配置对象，让它至少能按住拖动
-  var zyt_sw1 = new Swiper("#wySw1", {});
+  // ── 任务 1：初始化 #wySw1，让它至少可以拖动 ──
+  // TODO: 在这里写你的代码
+     var swiper = new Swiper("#wySw1", {});
 
-  // zyt_sw2 —— 功能：初始化演示二，循环 + 600ms + 圆点可点 + 箭头切换，并开启 keyboard 键盘控制
-  var zyt_sw2 = new Swiper("#wySw2", {
-    speed: 600,
-    loop: true,
-    pagination: {
-      el: "#wyPag2",
-      clickable: true,
-    },
-    navigation: {
-      nextEl: "#wyNext2",
-      prevEl: "#wyPrev2",
-    },
-    // 任务三超纲能力：keyboard 键盘控制（课堂上没讲过），← → 与 PageUp/PageDown 均可翻页
-    keyboard: {
-      enabled: true,
-      onlyInViewport: true,
-    },
-  });
+  // ── 任务 2：初始化 #wySw2，循环 + 600ms + 圆点可点 + 箭头切换 ──
+  // TODO: 在这里写你的代码
+var wySw2 = new Swiper("#wySw2", {
+  speed: 600,
+  loop: true,
+  pagination: {
+    el: "#wyPag2",
+    clickable: true,
+  },
+  navigation: {
+    nextEl: "#wyNext2",
+    prevEl: "#wyPrev2",
+  },
+  // zyt_keyboard —— 周怡彤：任务三超纲能力，键盘 ← → 翻页（Swiper 11 必须写对象，且 onlyInViewport 只在轮播进入视口时响应）
+  keyboard: {
+    enabled: true,
+    onlyInViewport: true,
+  },
+});
 
-  // zyt_sw3 —— 功能：初始化演示三，循环 + 2.6 秒自动翻页 + 拖动松手后继续自动播放 + 圆点
-  var zyt_sw3 = new Swiper("#wySw3", {
-    spaceBetween: 30,
-    centeredSlides: true,
-    autoplay: {
-      delay: 2600,
-      disableOnInteraction: false,
-    },
-    pagination: {
-      el: "#wyPag3",
-      clickable: true,
-    },
-  });
+  // ── 任务 3：初始化 #wySw3，循环 + 2.6 秒自动翻页 + 拖动后不停 + 圆点 ──
+  // TODO: 在这里写你的代码
+ var wySw3 = new Swiper("#wySw3", {
+   spaceBetween: 30,
+   centeredSlides: true,
+   autoplay: {
+     delay: 2600,
+     disableOnInteraction: false,
+   },
+   pagination: {
+     el: "#wyPag3",
+     clickable: true,
+   },
+   navigation: {
+     nextEl: "#wyNext3",
+     prevEl: "#wyPrev3",
+   },
+ });
 
-  // ── 演示四：七种效果实时切换（第 7 种 creative 为本任务新增） ──
-  var zyt_fx = 'slide';   // zyt_fx —— 当前效果名，默认 slide
-  var zyt_sw4 = null;     // zyt_sw4 —— 演示四实例，销毁重建时复用
+  // ── 任务 4：初始化 #wySw4，循环 + 3.2 秒自动播放 + 圆点 + 初始 effect ──
+  // 作者：杨祺轩（2026-11-06 完成）
+  var yqxFx = 'slide';   // 当前轮播效果名称，默认 slide
+  var yqxSw4 = null;     // 轮播实例（销毁重建时需要用到）
 
-  // 功能：按效果名创建演示四实例；creative 效果额外带自定义变换参数（电影墙）
-  function zyt_buildSw4(fx) {
-    // zyt_creativeEffect —— 上一张缩小左移并倾斜 8°，下一张从右侧放大推进落位
-    var zyt_creativeEffect = {
-      limitProgress: 2,                                                  // 最多向前叠加 2 张
-      prev: {
-        shadow: true,
-        translate: ['-45%', 0, -180],                                   // 左移 45% + 后退 180px（看起来变小）
-        rotate: [0, 0, 8],                                              // 绕 Z 轴倾斜 8°，做出"抽走"的斜角
-        scale: 0.82,                                                    // 缩小到 82%
-        opacity: 0.65,
-      },
-      next: {
-        shadow: true,
-        translate: ['100%', 0, 0],                                      // 停在右侧画面外，进入时向右滑入
-        scale: 1.15,                                                    // 放大 115%，形成"推向观众"的进场感
-        opacity: 0.9,
-      },
-    };
+  // 该函数用于按指定效果创建 #wySw4 轮播实例，销毁重建时复用同一份配置
+  function yqx_buildSw4(fx) {
     return new Swiper("#wySw4", {
-      effect: fx,
-      speed: 800,                                                       // 切换动画 800 毫秒
-      loop: true,                                                       // 无缝循环
-      autoplay: {
-        delay: 3200,
-        disableOnInteraction: false,
+      effect: fx,                                   // 切换效果：slide/fade/cube/coverflow/flip/cards
+      // zyt_creativeEffect —— 周怡彤：任务二新增第 7 种效果 creative「电影墙」的参数（仅 effect 为 creative 时生效）
+      creativeEffect: {
+        prev: {                                     // 上一张：缩小 + 左移 + 后退 + 逆时针转 8 度，像被推远的旧胶片
+          translate: ["-45%", 0, -180],
+          rotate: [0, 0, 8],
+          scale: 0.82,
+          opacity: 0.65,
+          shadow: true,
+        },
+        next: {                                     // 下一张：从右侧满幅放大进场，像新胶片贴上前台
+          translate: ["100%", 0, 0],
+          scale: 1.15,
+          opacity: 0.9,
+          shadow: true,
+        },
+        limitProgress: 2,                           // 相邻两张也参与动画，堆叠层次更明显
       },
-      pagination: {
+      speed: 800,                                   // 切换动画时长 800 毫秒
+      loop: true,                                   // 无缝循环
+      autoplay: {                                   // 自动播放
+        delay: 3200,                                // 每 3.2 秒翻一页
+        disableOnInteraction: false,                // 用户拖动后继续自动播放
+      },
+      pagination: {                                 // 底部圆点分页器
         el: "#wyPag4",
         clickable: true,
       },
-      creativeEffect: zyt_creativeEffect,
     });
   }
-  zyt_sw4 = zyt_buildSw4(zyt_fx);
+  yqxSw4 = yqx_buildSw4(yqxFx);                     // 初始用 slide 效果创建
 
-  // 功能：绑定七个效果按钮 —— 先清除全部按钮的选中态，再设置当前按钮选中态，最后销毁旧实例按新效果重建
-  document.querySelectorAll('.wy-fx button').forEach(function (zyt_btn) {
-    zyt_btn.addEventListener('click', function () {
-      document.querySelectorAll('.wy-fx button').forEach(function (zyt_b) {
-        zyt_b.classList.remove('wy-on');
+
+  // ── 任务 4 进阶：补全按钮点击事件，实现六种效果实时切换 ──
+  // 提示 1：动态换 effect 只改参数是无效的，必须销毁旧实例再重建（destroy + new）
+  // 提示 2：按钮上已有 data-fx 属性，用 btn.dataset.fx 读取要切换的效果名
+  document.querySelectorAll('.wy-fx button').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      // TODO 1：先给当前按钮加 wy-on 类、其余按钮去掉 wy-on（高亮当前按钮）
+      document.querySelectorAll('.wy-fx button').forEach(function(b){
+        b.classList.remove('wy-on');
       });
-      zyt_btn.classList.add('wy-on');
+      btn.classList.add('wy-on');
 
-      zyt_sw4.destroy(true, true);                                      // 真删实例 + 清掉旧效果残留的行内样式
-      zyt_fx = zyt_btn.dataset.fx;
-      zyt_sw4 = zyt_buildSw4(zyt_fx);
+      // TODO 2：销毁旧的 wySw4 实例（deleteInstance + cleanStyles，清掉旧效果留下的行内样式）
+      yqxSw4.destroy(true, true);
+
+      // TODO 3：用新 effect 重建实例（把其它配置原样保留）
+      yqxFx = btn.dataset.fx;                       // 从按钮的 data-fx 读取新效果名
+      yqxSw4 = yqx_buildSw4(yqxFx);
     });
   });
 
-  // ── 演示五：任务一提示词验证台（AI 第二轮答案原样粘贴，逐条验证四条需求） ──
-  // 功能：初始化 #zyt_mySwi4 —— 循环 + 3.2 秒自动播放且交互后不停 + 圆点可点 + 初始 cube 效果
+
+  // ══════════════════════════════════════════════════════════
+  //  zyt_verify —— 周怡彤：任务一「提示词验证台」（演示五）初始化
+  //  以下配置即提示词第二轮 AI 答案的落地版，四条需求逐项对应
+  // ══════════════════════════════════════════════════════════
+  // 功能: 初始化 #zyt_mySwi4，实现 ① loop 无缝循环 ② 3.2 秒自动播放且交互后不停 ③ 圆点可点击 ④ 初始 cube
   var zyt_swVerify = new Swiper("#zyt_mySwi4", {
-    effect: "cube",
-    cubeEffect: {
+    effect: "cube",                                 // ④ 初始效果：立方体
+    cubeEffect: {                                   // 立方体的立体参数（阴影 + 跟随投影）
       shadow: true,
-      slideShadows: true,
-      shadowOffset: 24,
-      shadowScale: 0.92,
+      shadowOffset: 20,
+      shadowScale: 0.94,
     },
-    speed: 800,
-    loop: true,
-    autoplay: {
-      delay: 3200,
-      disableOnInteraction: false,
+    speed: 800,                                     // 切换动画 800ms
+    loop: true,                                     // ① 无缝循环
+    autoplay: {                                     // ② 自动播放
+      delay: 3200,                                  //    每 3.2 秒翻一页
+      disableOnInteraction: false,                  //    手动拖动 / 点圆点后不停止
     },
-    pagination: {
+    pagination: {                                   // ③ 圆点分页器
       el: "#zyt_pagVerify",
       clickable: true,
     },
