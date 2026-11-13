@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<!--
+  作者: 周怡彤
+  建立时间: 2026-11-13
+  使用大模型: DeepSeek-V4.1-Flash
+  功能名称: 古诗卡片页（上图下文）—— 通过本地 Node 数据服务器获取 db/db.json 中的 poems 数据
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>古诗卡片 · 上图下文</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    font-family:"Microsoft YaHei","PingFang SC",serif;
+    background:linear-gradient(180deg,#f7f1e8 0%,#e8dcc8 100%);
+    color:#3a2f24;
+    min-height:100vh;
+    padding:40px 20px 60px;
+  }
+  .zyt_wrap{max-width:1100px;margin:0 auto}
+
+  /* 页头 */
+  .zyt_head{text-align:center;margin-bottom:40px}
+  .zyt_head h1{font-size:34px;letter-spacing:6px;color:#7a4a1e;font-weight:600}
+  .zyt_head h1::before,.zyt_head h1::after{content:"❖";margin:0 14px;color:#b08a5a;font-size:22px;vertical-align:middle}
+  .zyt_head p{margin-top:14px;color:#8a745a;font-size:14px;letter-spacing:2px}
+
+  /* 卡片网格 */
+  .zyt_grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+    gap:28px;
+  }
+
+  /* 卡片：上图下文 */
+  .zyt_card{
+    background:#fffdf7;
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow:0 8px 24px rgba(122,74,30,.12),0 2px 6px rgba(122,74,30,.06);
+    transition:transform .3s ease, box-shadow .3s ease;
+    display:flex;
+    flex-direction:column;
+  }
+  .zyt_card:hover{
+    transform:translateY(-6px);
+    box-shadow:0 16px 36px rgba(122,74,30,.18),0 4px 10px rgba(122,74,30,.08);
+  }
+
+  /* 上图 */
+  .zyt_card-img{
+    position:relative;
+    width:100%;
+    aspect-ratio:16/10;
+    background:linear-gradient(135deg,#d9c9a8,#b08a5a);
+    overflow:hidden;
+  }
+  .zyt_card-img img{
+    width:100%;height:100%;object-fit:cover;
+    display:block;transition:transform .5s ease;
+  }
+  .zyt_card:hover .zyt_card-img img{transform:scale(1.06)}
+  /* 图片加载失败时的兜底 */
+  .zyt_card-img img.onerror{
+    display:none;
+  }
+  .zyt_card-img::after{
+    /* 兜底占位（当 img 加载失败时显示，因为 img 被隐藏后背景色露出来了） */
+    content:"";
+    position:absolute;inset:0;
+    background:
+      radial-gradient(circle at 30% 30%, rgba(255,255,255,.2), transparent 50%),
+      linear-gradient(135deg,#c9b88d,#8e6a3c);
+    z-index:0;
+  }
+  .zyt_card-img img{position:relative;z-index:1}
+
+  /* 下文 */
+  .zyt_card-body{padding:20px 22px 22px;flex:1;display:flex;flex-direction:column}
+  .zyt_card-title{
+    font-size:20px;font-weight:600;color:#5d3a18;
+    padding-bottom:10px;margin-bottom:12px;
+    border-bottom:1px dashed #d9c9a8;
+    letter-spacing:2px;
+  }
+  .zyt_card-content{
+    font-size:15px;line-height:2;color:#3a2f24;
+    letter-spacing:1px;flex:1;
+  }
+  .zyt_card-foot{
+    margin-top:16px;padding-top:10px;
+    font-size:12px;color:#a89172;
+    border-top:1px solid #f0e6d2;text-align:right;
+  }
+
+  /* 加载/出错状态 */
+  .zyt_status{
+    text-align:center;padding:60px 20px;color:#8a745a;
+  }
+  .zyt_status.err{color:#b42318}
+  .zyt_status .zyt_retry{
+    display:inline-block;margin-top:14px;
+    padding:8px 22px;border:1px solid #b08a5a;border-radius:20px;
+    background:transparent;color:#7a4a1e;cursor:pointer;font-family:inherit;
+  }
+  .zyt_status .zyt_retry:hover{background:#f0e6d2}
+</style>
+</head>
+<body>
+<div class="zyt_wrap">
+  <div class="zyt_head">
+    <h1>古诗雅韵</h1>
+    <p>上图 · 下文 · 卡片式浏览</p>
+  </div>
+  <div id="zyt_list" class="zyt_grid">
+    <div class="zyt_status">加载中…</div>
+  </div>
+</div>
+
+<script>
+  // 功能: 从本地数据服务器获取 poems 数组并渲染为卡片列表；失败时提示用户启动 server.js
+  async function zyt_loadPoems() {
+    const listEl = document.getElementById("zyt_list");
+    try {
+      const resp = await fetch("http://localhost:3004/api/poems");
+      if (!resp.ok) throw new Error("HTTP " + resp.status);
+      const json = await resp.json();
+      const poems = json.data || json.poems || [];
+      zyt_renderCards(poems);
+    } catch (err) {
+      listEl.innerHTML =
+        '<div class="zyt_status err">' +
+        '<p>⚠️ 无法连接数据服务器（' + err.message + '）</p>' +
+        '<p style="margin-top:10px">请先在项目目录下执行：</p>' +
+        '<p style="font-family:Consolas,monospace;background:#f0e6d2;padding:8px 14px;border-radius:6px;margin:10px auto;display:inline-block">' +
+        'cd db &nbsp;&amp;&nbsp; node server.js</p>' +
+        '<br>然后刷新本页面。' +
+        '<br><button class="zyt_retry" onclick="zyt_loadPoems()">重试</button>' +
+        '</div>';
+    }
+  }
+
+  // 功能: 把 poems 数组渲染成「上图下文」卡片网格，每条诗生成一张卡片
+  function zyt_renderCards(poems) {
+    const listEl = document.getElementById("zyt_list");
+    if (!poems.length) {
+      listEl.innerHTML = '<div class="zyt_status">db.json 里还没有 poems 数据</div>';
+      return;
+    }
+    listEl.innerHTML = poems.map(function (item, i) {
+      var safeTitle = (item.title || "无题").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      var safeContent = (item.content || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      var pic = item.pic || "";
+      return (
+        '<div class="zyt_card">' +
+          '<div class="zyt_card-img">' +
+            (pic ? '<img src="' + pic + '" alt="' + safeTitle + '" referrerpolicy="no-referrer">' : "") +
+          '</div>' +
+          '<div class="zyt_card-body">' +
+            '<h3 class="zyt_card-title">' + safeTitle + '</h3>' +
+            '<p class="zyt_card-content">' + safeContent + '</p>' +
+            '<div class="zyt_card-foot">— 第 ' + (i + 1) + ' 首 —</div>' +
+          '</div>' +
+        '</div>'
+      );
+    }).join("");
+  }
+
+  // DOM 就绪立即加载
+  document.addEventListener("DOMContentLoaded", zyt_loadPoems);
+</script>
+</body>
+</html>
