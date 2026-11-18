@@ -4,13 +4,13 @@
   学号: 24002120118
   建立时间: 2026-11-18
   使用大模型: DeepSeek-V4.1-Flash
-  功能名称: 移动端触摸事件课堂实践 · 第 4 关 摇一摇彩蛋（devicemotion + 阈值 18 + 1.5 秒冷却 + 无传感器降级）
+  功能名称: 移动端触摸事件课堂实践 · 第 4 关 摇一摇 + 倾斜视差（devicemotion / deviceorientation + 阈值与冷却 + 权限 + 无传感器降级）
 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>第 4 关 · 摇一摇彩蛋 · 移动端触摸事件 4 关递进（周怡彤）</title>
+<title>第 4 关 · 摇一摇 + 倾斜视差 · 移动端触摸事件 4 关递进（周怡彤）</title>
 <style>
   /* zyt_reset —— 周怡彤：基础重置 + 去掉移动端点击灰块 */
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -92,6 +92,63 @@
   .zyt_fallback p{font-size:13.5px;color:#ffc9c9;line-height:1.9}
   .zyt_fallback .zyt_btn{margin:12px 0 12px}
 
+  /* zyt_tilt-* —— 周怡彤：倾斜视差场景（近层动得多、远层动得少） */
+  .zyt_tilt-panel{margin-top:18px}
+  .zyt_tilt-scene{
+    position:relative;height:280px;margin-top:16px;border-radius:16px;overflow:hidden;
+    background:linear-gradient(180deg,#071022 0%,#0d2140 52%,#0a1729 100%);
+    border:1px solid rgba(120,160,240,.26);
+    box-shadow:inset 0 0 40px rgba(0,0,0,.45);
+    touch-action:none;                 /* 场景内拖动模拟倾斜，不滚页面 */
+    user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;
+    cursor:grab;
+  }
+  .zyt_tilt-scene:active{cursor:grabbing}
+  .zyt_tilt-layer{position:absolute;inset:0;will-change:transform;pointer-events:none}
+  .zyt_tilt-sky{
+    inset:-8%;
+    background:
+      radial-gradient(1.6px 1.6px at 18% 22%,rgba(207,224,255,.9),transparent 60%),
+      radial-gradient(1.4px 1.4px at 32% 42%,rgba(207,224,255,.65),transparent 60%),
+      radial-gradient(1.8px 1.8px at 58% 18%,rgba(255,255,255,.8),transparent 60%),
+      radial-gradient(1.2px 1.2px at 76% 34%,rgba(207,224,255,.7),transparent 60%),
+      radial-gradient(1.6px 1.6px at 88% 14%,rgba(255,255,255,.75),transparent 60%),
+      radial-gradient(1.3px 1.3px at 44% 28%,rgba(207,224,255,.55),transparent 60%),
+      radial-gradient(1.2px 1.2px at 66% 48%,rgba(255,255,255,.5),transparent 60%);
+  }
+  .zyt_tilt-moon{
+    inset:34px 52px auto auto;width:46px;height:46px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#fff8e2,#ffd98a 58%,#e8a94a);
+    box-shadow:0 0 28px rgba(255,215,138,.55),0 0 70px rgba(255,190,90,.22);
+  }
+  .zyt_tilt-hill{top:auto;border-radius:50% 50% 0 0}
+  .zyt_tilt-hill-back{left:-18%;right:-18%;bottom:-16%;height:54%;background:linear-gradient(180deg,#12304f,#0c2038)}
+  .zyt_tilt-hill-front{left:-28%;right:-28%;bottom:-24%;height:46%;background:linear-gradient(180deg,#0b1d33,#071322)}
+  .zyt_tilt-glow{
+    top:auto;bottom:0;height:42%;
+    background:linear-gradient(180deg,transparent,rgba(79,140,255,.16) 65%,rgba(53,214,196,.12));
+  }
+  .zyt_tilt-card{
+    inset:auto;left:50%;top:50%;width:220px;height:138px;margin:-69px 0 0 -110px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;border-radius:16px;
+    background:linear-gradient(160deg,rgba(255,255,255,.16),rgba(255,255,255,.05));
+    border:1px solid rgba(255,255,255,.26);backdrop-filter:blur(6px);
+    box-shadow:0 18px 40px rgba(0,0,0,.42);
+  }
+  .zyt_tilt-card span{font-size:10.5px;letter-spacing:4px;color:var(--zyt_cyan)}
+  .zyt_tilt-card h3{font-size:20px;margin-top:6px;letter-spacing:1px}
+  .zyt_tilt-card p{font-size:12px;color:#b9c7e0;margin-top:4px;padding:0 14px;line-height:1.7}
+  .zyt_tilt-readout{
+    position:absolute;left:12px;bottom:12px;z-index:3;
+    font-family:Consolas,monospace;font-size:11.5px;color:#9fb8e6;
+    background:rgba(4,10,22,.62);border:1px solid rgba(120,160,240,.3);
+    border-radius:8px;padding:3px 9px;
+  }
+  .zyt_tilt-hint{position:absolute;right:12px;bottom:12px;z-index:3;font-size:11px;color:#8ea6cf}
+  .zyt_tilt-fallback{padding-bottom:14px}
+  .zyt_tilt-tip{font-size:12px!important;color:#ffd9a8!important;margin-top:6px}
+
   /* zyt_notes —— 周怡彤：验收说明与降级说明 */
   .zyt_notes{margin-top:18px;background:rgba(20,31,54,.9);border:1px solid var(--zyt_line);border-radius:16px;padding:16px 18px;font-size:13px;color:#b9c7e0;line-height:2}
   .zyt_notes h2{font-size:14.5px;color:#fff;margin-bottom:6px}
@@ -113,14 +170,14 @@
   <!-- zyt_head —— 周怡彤：第 4 关页头 -->
   <header class="zyt_head">
     <span class="zyt_badge">移动端触摸事件 · 4 关递进</span>
-    <h1 class="zyt_title">第 4 关 · <b>摇一摇彩蛋</b><br>传感器 · 权限 · 降级</h1>
+    <h1 class="zyt_title">第 4 关 · <b>摇一摇 / 倾斜视差</b><br>传感器 · 权限 · 降级</h1>
     <div class="zyt_meta">
       <span>姓名：周怡彤</span>
       <span>学号：24002120118</span>
       <span>维度：设备能力 · 权限 · 降级</span>
     </div>
-    <p class="zyt_lede">摇一摇手机，抽一道今日菜谱。一次摇动只触发一次；
-      没有传感器或没拿到权限时，页面会说明原因，并提供<b>“点我抽一次”</b>的按钮兜底。</p>
+    <p class="zyt_lede">摇一摇手机抽一道今日菜谱，倾斜手机看多层视差场景。一次摇动只触发一次；
+      没有传感器或没拿到权限时，页面会说明原因，并提供<b>按钮 / 拖动场景</b>两种兜底方式。</p>
   </header>
 
   <!-- zyt_panel —— 周怡彤：摇一摇主面板 -->
@@ -148,14 +205,56 @@
     </div>
   </main>
 
+  <!-- zyt_tilt-panel —— 周怡彤：倾斜视差（deviceorientation 驱动多层位移） -->
+  <section class="zyt_panel zyt_tilt-panel">
+    <p class="zyt_panel-title">倾 斜 手 机 · 多 层 视 差</p>
+
+    <div class="zyt_tilt-scene" id="zyt_tiltScene">
+      <div class="zyt_tilt-layer zyt_tilt-sky" data-depth="0.06"></div>
+      <div class="zyt_tilt-layer zyt_tilt-moon" data-depth="0.28"></div>
+      <div class="zyt_tilt-layer zyt_tilt-hill zyt_tilt-hill-back" data-depth="0.46"></div>
+      <div class="zyt_tilt-layer zyt_tilt-hill zyt_tilt-hill-front" data-depth="0.7"></div>
+      <div class="zyt_tilt-layer zyt_tilt-glow" data-depth="0.85"></div>
+      <div class="zyt_tilt-layer zyt_tilt-card" data-depth="1.25">
+        <span>DEVICE ORIENTATION</span>
+        <h3>倾斜手机</h3>
+        <p>远近不同的层移动幅度不同，形成视差</p>
+      </div>
+      <span class="zyt_tilt-readout" id="zyt_tiltReadout">γ +0° / β +0°</span>
+      <span class="zyt_tilt-hint">β 前后 · γ 左右</span>
+    </div>
+
+    <!-- 周怡彤：iOS 方向传感器同样需要用户点击授权 -->
+    <button class="zyt_btn zyt_hide" id="zyt_tiltPermBtn" type="button">开启倾斜视差</button>
+
+    <div class="zyt_sensor-info">
+      <p><span class="zyt_state-dot"></span><span id="zyt_tiltStatus">正在检测方向传感器…</span></p>
+      <p>倾斜角：<b id="zyt_tiltAngle">--</b></p>
+    </div>
+
+    <!-- zyt_fallback —— 周怡彤：无方向传感器时的降级提示，场景内拖动仍可体验 -->
+    <div class="zyt_fallback zyt_tilt-fallback zyt_hide" id="zyt_tiltFallback">
+      <p id="zyt_tiltFallbackMsg">当前设备不支持，请用手机打开</p>
+      <p class="zyt_tilt-tip">没有方向传感器？在场景里按住拖动，也能模拟倾斜。</p>
+    </div>
+  </section>
+
   <!-- zyt_notes —— 周怡彤：验收说明 -->
   <section class="zyt_notes">
-    <h2>验收四条</h2>
+    <h2>验收（摇一摇）</h2>
     <ul>
       <li>一次摇动只触发一次：超过阈值后进入 <b>1.5 秒冷却</b>，冷却期内的数据直接忽略。</li>
       <li>无传感器设备：2.5 秒内收不到有效数据，显示“当前设备不支持，请用手机打开”，不报错、不白屏。</li>
       <li>iOS 权限：`DeviceMotionEvent.requestPermission()` 必须由用户手势触发，所以用“开启摇一摇”按钮申请。</li>
       <li>阈值 <b>18</b> 是按“含重力的合成加速度”定的：静止时约 9.8，明显摇动才会超过 18。</li>
+    </ul>
+
+    <h2>验收（倾斜视差）</h2>
+    <ul>
+      <li>用 <code>deviceorientation</code> 的 β / γ，相对第一次读到的姿态取差值，不要求把手机摆成绝对水平。</li>
+      <li>多层按 <code>data-depth</code> 乘以不同幅度：近层 1.25、远层 0.06，形成视差；rAF 指数平滑 + ±18° 限幅防抖。</li>
+      <li>iOS 的 <code>DeviceOrientationEvent.requestPermission()</code> 同样必须按钮触发，所以单独提供“开启倾斜视差”。</li>
+      <li>没有方向传感器时：2.5 秒后提示不支持，同时在场景里拖动仍能模拟 γ / β，视差照样能演示。</li>
     </ul>
 
     <h2>accelerationIncludingGravity 与 acceleration 的区别</h2>
@@ -347,6 +446,221 @@ zyt_fallbackBtn.addEventListener("click", function () {
 
 // 启动
 zyt_sensorInit();
+
+// ══════════════════════════════════════════════════════════
+//  第 4 关 · B 倾斜视差
+//  deviceorientation → β / γ 相对初始姿态的差值 → 多层不同幅度位移
+//  没有方向传感器时：场景内拖动模拟倾斜，保证仍能体验视差
+// ══════════════════════════════════════════════════════════
+
+// 场景和所有视差层（data-depth 越大，移动幅度越大，视觉上离眼睛越近）
+var zyt_tiltScene = document.getElementById("zyt_tiltScene");
+var zyt_tiltLayers = Array.prototype.slice.call(
+  zyt_tiltScene.querySelectorAll(".zyt_tilt-layer")
+);
+var zyt_tiltReadout = document.getElementById("zyt_tiltReadout");
+var zyt_tiltStatus = document.getElementById("zyt_tiltStatus");
+var zyt_tiltAngle = document.getElementById("zyt_tiltAngle");
+var zyt_tiltPermBtn = document.getElementById("zyt_tiltPermBtn");
+var zyt_tiltFallback = document.getElementById("zyt_tiltFallback");
+var zyt_tiltFallbackMsg = document.getElementById("zyt_tiltFallbackMsg");
+
+// 角度上限：超过 ±18° 只按 18° 计算，避免画面被甩出边界
+var zyt_tiltMax = 18;
+
+// 目标值（传感器或手动拖动写入）与平滑值（每帧向目标靠近）
+var zyt_tiltTargetGamma = 0;   // γ：左右倾斜
+var zyt_tiltTargetBeta = 0;    // β：前后倾斜
+var zyt_tiltSmoothGamma = 0;
+var zyt_tiltSmoothBeta = 0;
+
+// 初始姿态基线：记录刚进入页面时的姿态，之后只用“差值”，不要求手机绝对水平
+var zyt_tiltBaseBeta = null;
+var zyt_tiltBaseGamma = null;
+
+// 运行状态
+var zyt_tiltStarted = false;
+var zyt_tiltGotData = false;
+var zyt_tiltFallbackTimer = null;
+
+// 手动拖动（降级模拟）状态
+var zyt_tiltDragging = false;
+var zyt_tiltDragStartX = 0;
+var zyt_tiltDragStartY = 0;
+var zyt_tiltDragBaseGamma = 0;
+var zyt_tiltDragBaseBeta = 0;
+
+// 功能: 把角度限制在 ±zyt_tiltMax 之间
+function zyt_tiltClamp(zyt_value) {
+  return Math.min(zyt_tiltMax, Math.max(-zyt_tiltMax, zyt_value));
+}
+
+// 功能: 每帧平滑角度并写入各层 transform，近层动得多、远层动得少
+function zyt_tiltFrame() {
+  // 指数平滑：过滤传感器噪声，避免画面高频抖动
+  zyt_tiltSmoothGamma += (zyt_tiltTargetGamma - zyt_tiltSmoothGamma) * 0.14;
+  zyt_tiltSmoothBeta += (zyt_tiltTargetBeta - zyt_tiltSmoothBeta) * 0.14;
+
+  var zyt_nx = zyt_tiltSmoothGamma / zyt_tiltMax;
+  var zyt_ny = zyt_tiltSmoothBeta / zyt_tiltMax;
+
+  zyt_tiltLayers.forEach(function (zyt_layer) {
+    var zyt_depth = parseFloat(zyt_layer.getAttribute("data-depth")) || 0;
+    var zyt_x = zyt_nx * zyt_depth * 26;
+    var zyt_y = -zyt_ny * zyt_depth * 18;
+    zyt_layer.style.transform =
+      "translate3d(" + zyt_x.toFixed(2) + "px," + zyt_y.toFixed(2) + "px,0)";
+  });
+
+  // 读数：γ 左右、β 前后
+  var zyt_gammaText = "γ " + (zyt_tiltSmoothGamma >= 0 ? "+" : "") + zyt_tiltSmoothGamma.toFixed(0) + "°";
+  var zyt_betaText = "β " + (zyt_tiltSmoothBeta >= 0 ? "+" : "") + zyt_tiltSmoothBeta.toFixed(0) + "°";
+  zyt_tiltReadout.textContent = zyt_gammaText + " / " + zyt_betaText;
+  zyt_tiltAngle.textContent = zyt_gammaText + " / " + zyt_betaText;
+
+  requestAnimationFrame(zyt_tiltFrame);
+}
+
+// 功能: 显示倾斜视差的降级提示，并写明原因
+function zyt_tiltShowFallback(zyt_reason) {
+  zyt_tiltFallback.classList.remove("zyt_hide");
+  zyt_tiltFallbackMsg.textContent = zyt_reason;
+  zyt_tiltStatus.textContent = zyt_reason;
+}
+
+// 功能: 处理 deviceorientation 数据——第一次记录基线，之后用 β/γ 差值驱动视差
+function zyt_tiltOnOrientation(e) {
+  // 有些桌面浏览器会派发事件但数值为 null，视作“没有方向传感器”
+  if (e.beta === null || e.gamma === null ||
+      e.beta === undefined || e.gamma === undefined) {
+    if (!zyt_tiltGotData) {
+      zyt_tiltShowFallback("当前设备不支持，请用手机打开");
+    }
+    return;
+  }
+
+  // 第一次拿到有效数据：标记可用，撤掉“无数据”降级定时器
+  if (!zyt_tiltGotData) {
+    zyt_tiltGotData = true;
+    if (zyt_tiltFallbackTimer) {
+      clearTimeout(zyt_tiltFallbackTimer);
+      zyt_tiltFallbackTimer = null;
+    }
+    zyt_tiltFallback.classList.add("zyt_hide");
+    zyt_tiltStatus.textContent = "方向传感器已就绪，倾斜手机试试";
+  }
+
+  // 第一帧只记基线，不产生位移，避免刚打开就跳一下
+  if (zyt_tiltBaseBeta === null || zyt_tiltBaseGamma === null) {
+    zyt_tiltBaseBeta = e.beta;
+    zyt_tiltBaseGamma = e.gamma;
+    return;
+  }
+
+  zyt_tiltTargetBeta = zyt_tiltClamp(e.beta - zyt_tiltBaseBeta);
+  zyt_tiltTargetGamma = zyt_tiltClamp(e.gamma - zyt_tiltBaseGamma);
+}
+
+// 功能: 注册 deviceorientation 监听；2.5 秒内没有有效数据就进入降级
+function zyt_tiltStart() {
+  if (zyt_tiltStarted) return;
+
+  if (typeof DeviceOrientationEvent === "undefined") {
+    zyt_tiltShowFallback("当前设备不支持，请用手机打开");
+    return;
+  }
+
+  zyt_tiltStarted = true;
+  window.addEventListener("deviceorientation", zyt_tiltOnOrientation);
+  zyt_tiltStatus.textContent = "正在等待倾斜…";
+
+  zyt_tiltFallbackTimer = setTimeout(function () {
+    if (!zyt_tiltGotData) {
+      zyt_tiltShowFallback("当前设备不支持，请用手机打开");
+    }
+  }, 2500);
+}
+
+// 功能: iOS 授权——requestPermission 必须由用户点击触发
+function zyt_tiltRequestPermission() {
+  zyt_tiltPermBtn.classList.add("zyt_hide");
+
+  DeviceOrientationEvent.requestPermission().then(function (zyt_state) {
+    if (zyt_state === "granted") {
+      zyt_tiltStart();
+    } else {
+      zyt_tiltShowFallback("未获得方向传感器权限，请用手机打开或在场景里拖动");
+    }
+  }).catch(function () {
+    // 用户取消或浏览器不支持，同样走降级，不能让页面无响应
+    zyt_tiltShowFallback("权限申请失败，请用手机打开或在场景里拖动");
+  });
+}
+
+// 功能: 初始化——iOS 显示授权按钮，其他设备直接监听，拿不到数据再降级
+function zyt_tiltInit() {
+  if (typeof DeviceOrientationEvent !== "undefined" &&
+      typeof DeviceOrientationEvent.requestPermission === "function") {
+    zyt_tiltStatus.textContent = "iOS 需要先授权方向传感器";
+    zyt_tiltPermBtn.classList.remove("zyt_hide");
+    zyt_tiltPermBtn.addEventListener("click", zyt_tiltRequestPermission);
+    return;
+  }
+
+  zyt_tiltStart();
+}
+
+// 功能: 手指 / 鼠标在场景内按下，进入手动模拟倾斜
+zyt_tiltScene.addEventListener("pointerdown", function (e) {
+  zyt_tiltDragging = true;
+  zyt_tiltDragStartX = e.clientX;
+  zyt_tiltDragStartY = e.clientY;
+  zyt_tiltDragBaseGamma = zyt_tiltTargetGamma;
+  zyt_tiltDragBaseBeta = zyt_tiltTargetBeta;
+
+  if (zyt_tiltScene.setPointerCapture) {
+    zyt_tiltScene.setPointerCapture(e.pointerId);
+  }
+  if (!zyt_tiltGotData) {
+    zyt_tiltStatus.textContent = "手动模拟倾斜中…";
+  }
+});
+
+// 功能: 拖动时把横向 / 纵向位移换算成 γ / β 目标角度（降级方案）
+zyt_tiltScene.addEventListener("pointermove", function (e) {
+  if (!zyt_tiltDragging) return;
+
+  zyt_tiltTargetGamma = zyt_tiltClamp(
+    zyt_tiltDragBaseGamma + (e.clientX - zyt_tiltDragStartX) * 0.3
+  );
+  zyt_tiltTargetBeta = zyt_tiltClamp(
+    zyt_tiltDragBaseBeta - (e.clientY - zyt_tiltDragStartY) * 0.3
+  );
+});
+
+// 功能: 松开 / 取消拖动，结束手动模拟
+function zyt_tiltEndDrag() {
+  if (!zyt_tiltDragging) return;
+  zyt_tiltDragging = false;
+
+  if (!zyt_tiltGotData) {
+    zyt_tiltStatus.textContent = "可继续在场景里拖动模拟倾斜";
+  }
+}
+zyt_tiltScene.addEventListener("pointerup", zyt_tiltEndDrag);
+zyt_tiltScene.addEventListener("pointercancel", zyt_tiltEndDrag);
+
+// 转屏后手机握持姿态变了，清空基线，等下一次有效数据重新校准
+window.addEventListener("orientationchange", function () {
+  setTimeout(function () {
+    zyt_tiltBaseBeta = null;
+    zyt_tiltBaseGamma = null;
+  }, 300);
+});
+
+// 启动倾斜视差：初始化监听 + 启动渲染循环
+zyt_tiltInit();
+requestAnimationFrame(zyt_tiltFrame);
 </script>
 </body>
 </html>
