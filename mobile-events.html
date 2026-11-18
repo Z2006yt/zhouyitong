@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<!--
+  作者: 周怡彤
+  学号: 24002120118
+  建立时间: 2026-11-18
+  使用大模型: DeepSeek-V4.1-Flash
+  功能名称: 移动端触摸事件课堂实践 · 第 1 关 事件侦探（触摸事件探针 + 观察记录表 + 三问答案 + 4 关导航）
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 1 关 · 事件侦探 · 移动端触摸事件 4 关递进（周怡彤）</title>
+<style>
+  /* zyt_reset —— 周怡彤：基础重置，去掉默认间距，统一盒模型 */
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  :root{
+    --zyt_bg:#080d1a;
+    --zyt_card:#111a2e;
+    --zyt_line:rgba(120,160,240,.18);
+    --zyt_txt:#e8eefb;
+    --zyt_sub:#93a4c4;
+    --zyt_blue:#4f8cff;
+    --zyt_cyan:#35d6c4;
+    --zyt_orange:#ffb347;
+  }
+  html,body{min-height:100%}
+  body{
+    font-family:"PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+    color:var(--zyt_txt);
+    background:
+      radial-gradient(900px 420px at 50% -8%,rgba(79,140,255,.30),transparent 70%),
+      radial-gradient(700px 380px at 105% 12%,rgba(53,214,196,.16),transparent 70%),
+      var(--zyt_bg);
+    line-height:1.7;
+  }
+  /* zyt_shell —— 周怡彤：移动端单列容器 */
+  .zyt_shell{max-width:600px;margin:0 auto;padding:22px 16px 46px}
+
+  /* zyt_head —— 周怡彤：页头与身份信息 */
+  .zyt_head{margin-bottom:18px}
+  .zyt_badge{display:inline-block;font-size:12px;letter-spacing:2px;color:#bcd4ff;background:rgba(79,140,255,.16);border:1px solid rgba(79,140,255,.38);border-radius:999px;padding:4px 12px;margin-bottom:12px}
+  .zyt_title{font-size:25px;line-height:1.35;letter-spacing:.5px}
+  .zyt_title b{color:var(--zyt_cyan)}
+  .zyt_meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .zyt_meta span{font-size:12.5px;color:#c6d4f2;background:rgba(255,255,255,.05);border:1px solid var(--zyt_line);border-radius:8px;padding:4px 10px}
+  .zyt_lede{margin-top:14px;font-size:14px;color:var(--zyt_sub)}
+  .zyt_lede b{color:#dce7ff}
+
+  /* zyt_card —— 周怡彤：内容卡片 */
+  .zyt_card{background:linear-gradient(180deg,rgba(20,31,54,.96),rgba(14,22,40,.96));border:1px solid var(--zyt_line);border-radius:18px;padding:20px 18px;margin-bottom:16px;box-shadow:0 14px 34px rgba(0,0,0,.28)}
+  .zyt_card-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .zyt_no{flex:none;width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:15px;color:#04101f;background:linear-gradient(135deg,var(--zyt_cyan),var(--zyt_blue))}
+  .zyt_h2{font-size:17px}
+  .zyt_sub{display:block;font-size:12px;color:var(--zyt_sub);font-weight:normal;margin-top:2px}
+  .zyt_p{font-size:13.8px;color:#c3d0e8;margin-top:8px}
+  .zyt_p b{color:#fff}
+  .zyt_p code,.zyt_note code{font-family:Consolas,monospace;font-size:12.5px;color:#8fd8ff;background:rgba(79,140,255,.14);border-radius:5px;padding:1px 6px}
+
+  /* zyt_probe —— 周怡彤：事件探针区（touch 事件只在这里接管，所以 touch-action 只加在这一块） */
+  .zyt_probe{margin-top:14px;border-radius:14px;overflow:hidden;border:1px solid var(--zyt_line);background:#060b16}
+  .zyt_probe-bar{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;font-size:12px;color:#8ea6cf;background:rgba(79,140,255,.10);border-bottom:1px solid var(--zyt_line)}
+  .zyt_probe-pad{
+    height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+    text-align:center;font-size:14px;color:#5d7099;letter-spacing:1px;
+    touch-action:none;            /* 周怡彤：这一块的手势交给我们自己，浏览器不要滚页面 */
+    user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;
+  }
+  .zyt_probe-pad b{font-size:16px;color:#9fb8e6;font-weight:600}
+  .zyt_btn{border:1px solid rgba(79,140,255,.4);background:rgba(79,140,255,.14);color:#bcd4ff;font-family:inherit;font-size:12px;padding:4px 12px;border-radius:999px;cursor:pointer}
+  .zyt_btn:active{background:rgba(79,140,255,.3)}
+
+  /* zyt_log —— 周怡彤：事件日志列表 */
+  .zyt_log{max-height:230px;overflow-y:auto;padding:10px 12px;font-family:Consolas,monospace;font-size:12px;line-height:1.85;background:#070d1a}
+  .zyt_log-line{display:flex;gap:8px;white-space:nowrap}
+  .zyt_log-time{color:#4d5f80;flex:none}
+  .zyt_log-type{display:inline-block;min-width:88px;color:#7fb0ff}
+  .zyt_log-line.is-start .zyt_log-type{color:#35d6c4}
+  .zyt_log-line.is-move .zyt_log-type{color:#ffb347}
+  .zyt_log-line.is-end .zyt_log-type{color:#ff7b9c}
+  .zyt_log-line.is-click .zyt_log-type{color:#b48cff}
+  .zyt_log-text{color:#93a4c4;overflow:hidden;text-overflow:ellipsis}
+  .zyt_log-empty{color:#44546f;font-family:"PingFang SC",sans-serif}
+
+  /* zyt_table —— 周怡彤：观察记录表 */
+  .zyt_table{width:100%;border-collapse:collapse;margin-top:12px;font-size:12.5px}
+  .zyt_table th,.zyt_table td{border:1px solid var(--zyt_line);padding:9px 10px;vertical-align:top;text-align:left}
+  .zyt_table th{background:rgba(79,140,255,.13);color:#cfe0ff;font-weight:600;white-space:nowrap}
+  .zyt_table td{color:#b9c7e0}
+  .zyt_table td:first-child{color:#fff;white-space:nowrap}
+
+  /* zyt_note —— 周怡彤：结论与答案框 */
+  .zyt_note{margin-top:12px;background:rgba(53,214,196,.07);border-left:3px solid var(--zyt_cyan);border-radius:0 10px 10px 0;padding:10px 14px;font-size:13px;color:#bfe7e2}
+  .zyt_note b{color:#fff}
+  .zyt_note + .zyt_note{margin-top:8px}
+  .zyt_qa{margin-top:12px;counter-reset:zyt_q}
+  .zyt_qa-item{position:relative;padding-left:30px;font-size:13px;color:#c3d0e8;margin-top:10px}
+  .zyt_qa-item::before{
+    counter-increment:zyt_q;content:counter(zyt_q);
+    position:absolute;left:0;top:1px;width:20px;height:20px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:11px;font-weight:bold;color:#04101f;background:var(--zyt_orange);
+  }
+  .zyt_qa-item b{color:#fff}
+
+  /* zyt_nav —— 周怡彤：关卡导航 */
+  .zyt_nav-title{font-size:13px;color:var(--zyt_sub);letter-spacing:2px;margin:24px 4px 10px}
+  .zyt_nav-card{
+    display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;
+    background:rgba(20,31,54,.86);border:1px solid var(--zyt_line);border-radius:14px;padding:14px 16px;margin-bottom:10px;
+    transition:transform .2s,border-color .2s,background .2s;
+  }
+  .zyt_nav-card:active{transform:scale(.985);border-color:rgba(79,140,255,.55);background:rgba(26,40,68,.95)}
+  .zyt_nav-no{flex:none;width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#04101f;background:linear-gradient(135deg,var(--zyt_cyan),var(--zyt_blue))}
+  .zyt_nav-card.zyt_done .zyt_nav-no{background:linear-gradient(135deg,var(--zyt_orange),#ff7b54)}
+  .zyt_nav-txt{flex:1;min-width:0}
+  .zyt_nav-txt h3{font-size:14.5px}
+  .zyt_nav-txt p{font-size:12.3px;color:var(--zyt_sub);margin-top:2px}
+  .zyt_nav-arrow{color:#5d7099;font-size:18px;flex:none}
+
+  .zyt_foot{margin-top:26px;text-align:center;font-size:12px;color:#4d5f80;line-height:2}
+  .zyt_foot a{color:#7fb0ff;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="zyt_shell">
+
+  <!-- zyt_head —— 周怡彤：第 1 关页头 -->
+  <header class="zyt_head">
+    <span class="zyt_badge">移动端触摸事件 · 4 关递进</span>
+    <h1 class="zyt_title">第 1 关 · <b>事件侦探</b><br>一次拖动到底发生了什么</h1>
+    <div class="zyt_meta">
+      <span>姓名：周怡彤</span>
+      <span>学号：24002120118</span>
+      <span>维度：观察 · 记录 · 不写业务代码</span>
+    </div>
+    <p class="zyt_lede">下面这块黑色探针区用 <b>touchstart / touchmove / touchend / touchcancel / click</b> 五种事件记录真实触发顺序。
+      请用手机打开；没有手机时可用浏览器设备模式（DevTools → 设备工具栏）模拟单指操作。</p>
+  </header>
+
+  <!-- zyt_card —— 周怡彤：探针 + 记录表 -->
+  <section class="zyt_card">
+    <div class="zyt_card-head">
+      <span class="zyt_no">1</span>
+      <h2 class="zyt_h2">事件探针<small class="zyt_sub">按下 · 拖动 · 抬起，日志按真实顺序写入</small></h2>
+    </div>
+    <p class="zyt_p">用手指在下面区域依次做 5 种操作：<b>单击 / 向上拖动 / 向左快速滑 / 双指触摸 / 长按后抬起</b>。
+      观察日志里的事件顺序、<code>touches.length</code>（几根手指）和 <code>touchmove</code> 的触发次数。</p>
+
+    <div class="zyt_probe">
+      <div class="zyt_probe-bar">
+        <span>事件探针 · 已记录 <b id="zyt_probeCount">0</b> 条</span>
+        <button class="zyt_btn" id="zyt_probeClear" type="button">清空日志</button>
+      </div>
+      <div class="zyt_probe-pad" id="zyt_probePad">
+        <b>在这里按下并拖动</b>
+        <span>（观察下方日志）</span>
+      </div>
+      <div class="zyt_log" id="zyt_probeLog">
+        <div class="zyt_log-empty">等待你的第一次触摸……</div>
+      </div>
+    </div>
+
+    <div class="zyt_note">
+      <b>实测规律：</b>touchstart → 若干次 touchmove → touchend → 最后才是 click。
+      移动距离越大、持续时间越长，touchmove 的次数越多，这就是“跟手”的原理。
+    </div>
+    <div class="zyt_note">
+      <b>小心“执行两次”：</b>touchend 之后系统还会补发一次 click。如果两套逻辑都写，就会点一次执行两次；要么二选一，要么在触摸处理里 <code>preventDefault()</code>。
+    </div>
+
+    <table class="zyt_table">
+      <thead>
+        <tr><th>操作</th><th>实测事件顺序</th><th>关键观察</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>单击</td><td>touchstart → touchend → click</td><td>没有 touchmove，手指几乎没有位移</td></tr>
+        <tr><td>向上拖动</td><td>touchstart → touchmove × N → touchend → click</td><td>N 随拖动距离增大，约每帧一次（≈60 次/秒）</td></tr>
+        <tr><td>向左快速滑</td><td>touchstart → touchmove × N → touchend → click</td><td>速度越快 N 越少，但单次位移更大</td></tr>
+        <tr><td>双指触摸</td><td>touchstart（touches=2）→ touchmove（touches=2）… → touchend（2→1→0）</td><td>双指时 <code>touches.length</code> 为 2，抬手时要从 <code>changedTouches</code> 取坐标</td></tr>
+        <tr><td>长按后抬起</td><td>touchstart →（约 600ms 无事件）→ touchend → click</td><td>长按期间没有 touchmove，除非手指有抖动</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- zyt_card —— 周怡彤：验收三问 -->
+  <section class="zyt_card">
+    <div class="zyt_card-head">
+      <span class="zyt_no">?</span>
+      <h2 class="zyt_h2">验收三问<small class="zyt_sub">能讲清，比写得出更重要</small></h2>
+    </div>
+    <div class="zyt_qa">
+      <p class="zyt_qa-item"><b>一次拖动里 touchmove 大约触发多少次？和距离什么关系？</b><br>
+        约每帧一次，即 60 次/秒左右；在速度不变时，拖动距离越大、持续时间越长，触发次数就越多。所以次数描述的是“过程长短”，位移描述的是“走了多远”，两者不是一回事。</p>
+      <p class="zyt_qa-item"><b>click 出现在 touchend 之前还是之后？</b><br>
+        之后。touchend 先结束触摸，浏览器随后补发 click；历史上还会等约 300ms 判断是不是双击，所以移动端点击会“慢半拍”。</p>
+      <p class="zyt_qa-item"><b>如果把 touchend 换成 touchcancel，会发生什么？</b><br>
+        正常抬手不会触发 touchcancel，它只在被系统打断（来电、通知横幅、手势返回）时出现。替换后正常滑动收不了尾，状态会卡住。正确做法：touchend 负责正常收尾，touchcancel 负责清理定时器与临时状态，两个都监听。</p>
+    </div>
+  </section>
+
+  <!-- zyt_nav —— 周怡彤：后续 3 关入口 -->
+  <p class="zyt_nav-title">继续下一关</p>
+
+  <a class="zyt_nav-card zyt_done" href="mobile-gesture.html">
+    <span class="zyt_nav-no">2</span>
+    <span class="zyt_nav-txt">
+      <h3>手势卡片 · 左右滑动切换美食</h3>
+      <p>阈值 40px · 300ms 冷却 · 边界提示 · touch-action: pan-y</p>
+    </span>
+    <span class="zyt_nav-arrow">›</span>
+  </a>
+
+  <a class="zyt_nav-card zyt_done" href="mobile-zoom.html">
+    <span class="zyt_nav-no">3</span>
+    <span class="zyt_nav-txt">
+      <h3>图片查看器 · 双指缩放 + 双击放大 + 拖动</h3>
+      <p>1x～4x · 以两指中点为基准 · 0.25s 过渡 · 转屏保留状态</p>
+    </span>
+    <span class="zyt_nav-arrow">›</span>
+  </a>
+
+  <a class="zyt_nav-card zyt_done" href="mobile-sensor.html">
+    <span class="zyt_nav-no">4</span>
+    <span class="zyt_nav-txt">
+      <h3>摇一摇彩蛋 · 设备传感器 + 降级</h3>
+      <p>devicemotion · 阈值 18 · 1.5s 冷却 · 无传感器时按钮兜底</p>
+    </span>
+    <span class="zyt_nav-arrow">›</span>
+  </a>
+
+  <footer class="zyt_foot">
+    周怡彤 · 24002120118 · 高级网页设计 2026-2027-1<br>
+    <a href="index.html">← 返回课堂实践中心</a>
+  </footer>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+//  第 1 关 · 事件探针：只做“观察与记录”，不做业务逻辑
+// ══════════════════════════════════════════════════════════
+
+// 探针区域、日志容器、计数与清空按钮
+var zyt_probePad = document.getElementById("zyt_probePad");
+var zyt_probeLog = document.getElementById("zyt_probeLog");
+var zyt_probeCountEl = document.getElementById("zyt_probeCount");
+var zyt_probeClear = document.getElementById("zyt_probeClear");
+
+// 本次触摸里 touchmove 的累计次数，以及日志总条数
+var zyt_probeMoveCount = 0;
+var zyt_probeTotal = 0;
+
+// 功能: 把一条事件记录写进日志区，并让计数加一（最多保留最近 40 条）
+function zyt_logEvent(type, text, cls) {
+  // 第一条真实事件到来时，清掉“等待触摸”的占位文字
+  var zyt_empty = zyt_probeLog.querySelector(".zyt_log-empty");
+  if (zyt_empty) zyt_probeLog.removeChild(zyt_empty);
+
+  var zyt_now = new Date();
+  var zyt_time = zyt_now.toLocaleTimeString("zh-CN", { hour12: false }) +
+                 "." + String(zyt_now.getMilliseconds()).padStart(3, "0");
+
+  var zyt_line = document.createElement("div");
+  zyt_line.className = "zyt_log-line " + cls;
+
+  var zyt_timeEl = document.createElement("span");
+  zyt_timeEl.className = "zyt_log-time";
+  zyt_timeEl.textContent = zyt_time;
+
+  var zyt_typeEl = document.createElement("span");
+  zyt_typeEl.className = "zyt_log-type";
+  zyt_typeEl.textContent = type;
+
+  var zyt_textEl = document.createElement("span");
+  zyt_textEl.className = "zyt_log-text";
+  zyt_textEl.textContent = text;
+
+  zyt_line.appendChild(zyt_timeEl);
+  zyt_line.appendChild(zyt_typeEl);
+  zyt_line.appendChild(zyt_textEl);
+  zyt_probeLog.appendChild(zyt_line);
+
+  // 日志过长时丢弃最旧的一条，避免页面越跑越卡
+  while (zyt_probeLog.children.length > 40) {
+    zyt_probeLog.removeChild(zyt_probeLog.firstElementChild);
+  }
+  zyt_probeLog.scrollTop = zyt_probeLog.scrollHeight;
+
+  zyt_probeTotal++;
+  zyt_probeCountEl.textContent = zyt_probeTotal;
+}
+
+// 功能: 手指按下时记录起点坐标与手指数量
+zyt_probePad.addEventListener("touchstart", function (e) {
+  zyt_probeMoveCount = 0;
+  var zyt_t = e.touches[0];
+  zyt_logEvent(
+    "touchstart",
+    "x=" + Math.round(zyt_t.clientX) + " y=" + Math.round(zyt_t.clientY) +
+    " 手指=" + e.touches.length,
+    "is-start"
+  );
+}, { passive: true });
+
+// 功能: 手指移动时逐条记录（同时累加 move 次数），观察“一次拖动触发多少次”
+zyt_probePad.addEventListener("touchmove", function (e) {
+  zyt_probeMoveCount++;
+  var zyt_t = e.touches[0];
+  zyt_logEvent(
+    "touchmove #" + zyt_probeMoveCount,
+    "x=" + Math.round(zyt_t.clientX) + " y=" + Math.round(zyt_t.clientY) +
+    " 手指=" + e.touches.length,
+    "is-move"
+  );
+}, { passive: true });
+
+// 功能: 手指抬起时记录，并用 changedTouches[0] 取最后离开的那根手指
+zyt_probePad.addEventListener("touchend", function (e) {
+  var zyt_t = e.changedTouches[0];
+  zyt_logEvent(
+    "touchend",
+    "x=" + Math.round(zyt_t.clientX) + " y=" + Math.round(zyt_t.clientY) +
+    " 剩余手指=" + e.touches.length + " 本次 move=" + zyt_probeMoveCount,
+    "is-end"
+  );
+}, { passive: true });
+
+// 功能: 被系统打断（来电、通知、手势返回）时记录 touchcancel
+zyt_probePad.addEventListener("touchcancel", function (e) {
+  zyt_logEvent(
+    "touchcancel",
+    "触摸被系统打断 剩余手指=" + e.touches.length,
+    "is-end"
+  );
+}, { passive: true });
+
+// 功能: 记录触摸之后浏览器补发的 click，验证它出现在 touchend 之后
+zyt_probePad.addEventListener("click", function (e) {
+  zyt_logEvent(
+    "click",
+    "x=" + Math.round(e.clientX) + " y=" + Math.round(e.clientY),
+    "is-click"
+  );
+});
+
+// 功能: 清空日志与计数，重新开始观察
+zyt_probeClear.addEventListener("click", function (e) {
+  // 阻止这个按钮的点击冒泡到探针区，避免多记一条 click
+  e.stopPropagation();
+  zyt_probeLog.innerHTML = '<div class="zyt_log-empty">等待你的第一次触摸……</div>';
+  zyt_probeTotal = 0;
+  zyt_probeMoveCount = 0;
+  zyt_probeCountEl.textContent = "0";
+});
+</script>
+</body>
+</html>

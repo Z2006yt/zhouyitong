@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<!--
+  作者: 周怡彤
+  学号: 24002120118
+  建立时间: 2026-11-18
+  使用大模型: DeepSeek-V4.1-Flash
+  功能名称: 移动端触摸事件课堂实践 · 第 4 关 摇一摇彩蛋（devicemotion + 阈值 18 + 1.5 秒冷却 + 无传感器降级）
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 4 关 · 摇一摇彩蛋 · 移动端触摸事件 4 关递进（周怡彤）</title>
+<style>
+  /* zyt_reset —— 周怡彤：基础重置 + 去掉移动端点击灰块 */
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  :root{
+    --zyt_bg:#080d1a;
+    --zyt_line:rgba(120,160,240,.18);
+    --zyt_txt:#e8eefb;
+    --zyt_sub:#93a4c4;
+    --zyt_blue:#4f8cff;
+    --zyt_cyan:#35d6c4;
+    --zyt_orange:#ffb347;
+    --zyt_red:#ff8a8a;
+  }
+  body{
+    font-family:"PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+    color:var(--zyt_txt);min-height:100vh;line-height:1.7;
+    background:
+      radial-gradient(900px 420px at 50% -8%,rgba(79,140,255,.28),transparent 70%),
+      radial-gradient(700px 380px at 105% 12%,rgba(255,179,71,.14),transparent 70%),
+      var(--zyt_bg);
+  }
+  /* zyt_shell —— 周怡彤：移动端单列容器 */
+  .zyt_shell{max-width:600px;margin:0 auto;padding:22px 16px 46px}
+
+  /* zyt_head —— 周怡彤：页头与身份信息 */
+  .zyt_head{margin-bottom:16px}
+  .zyt_badge{display:inline-block;font-size:12px;letter-spacing:2px;color:#bcd4ff;background:rgba(79,140,255,.16);border:1px solid rgba(79,140,255,.38);border-radius:999px;padding:4px 12px;margin-bottom:12px}
+  .zyt_title{font-size:25px;line-height:1.35;letter-spacing:.5px}
+  .zyt_title b{color:var(--zyt_orange)}
+  .zyt_meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .zyt_meta span{font-size:12.5px;color:#c6d4f2;background:rgba(255,255,255,.05);border:1px solid var(--zyt_line);border-radius:8px;padding:4px 10px}
+  .zyt_lede{margin-top:14px;font-size:14px;color:var(--zyt_sub)}
+  .zyt_lede b{color:#dce7ff}
+
+  /* zyt_panel —— 周怡彤：摇一摇面板 */
+  .zyt_panel{
+    position:relative;margin-top:16px;border-radius:20px;padding:22px 18px 20px;
+    background:
+      radial-gradient(420px 220px at 50% 0%,rgba(255,179,71,.20),transparent 70%),
+      linear-gradient(180deg,rgba(24,36,62,.96),rgba(13,21,38,.98));
+    border:1px solid rgba(120,160,240,.24);box-shadow:0 20px 46px rgba(0,0,0,.42);
+    text-align:center;overflow:hidden;
+  }
+  .zyt_panel-title{font-size:13px;letter-spacing:3px;color:#9fb8e6}
+
+  /* zyt_draw-card —— 周怡彤：抽签结果卡 */
+  .zyt_draw-card{
+    margin:16px auto 0;max-width:340px;border-radius:18px;padding:20px 18px;
+    background:linear-gradient(160deg,rgba(255,255,255,.10),rgba(255,255,255,.03));
+    border:1px solid rgba(255,255,255,.16);
+  }
+  .zyt_draw-card.zyt_pop{animation:zyt_pop .5s cubic-bezier(.2,1.4,.4,1)}
+  @keyframes zyt_pop{
+    0%{transform:scale(.78) translateY(10px);opacity:.2}
+    60%{transform:scale(1.04) translateY(0);opacity:1}
+    100%{transform:scale(1)}
+  }
+  .zyt_draw-label{font-size:12px;letter-spacing:4px;color:var(--zyt_orange)}
+  .zyt_draw-name{font-size:28px;line-height:1.3;margin-top:6px;letter-spacing:1px}
+  .zyt_draw-desc{font-size:13px;color:#b9c7e0;margin-top:8px;line-height:1.9}
+
+  /* zyt_sensor-info —— 周怡彤：传感器状态与实时加速度 */
+  .zyt_sensor-info{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;margin-top:16px;font-size:12.5px;color:var(--zyt_sub)}
+  .zyt_sensor-info b{color:#fff;font-family:Consolas,monospace}
+  .zyt_state-dot{width:8px;height:8px;border-radius:50%;background:var(--zyt_cyan);box-shadow:0 0 10px var(--zyt_cyan);display:inline-block;margin-right:6px;vertical-align:1px}
+
+  /* zyt_btn —— 周怡彤：按钮通用样式 */
+  .zyt_btn{
+    display:inline-block;margin-top:14px;border:0;cursor:pointer;font-family:inherit;
+    font-size:14.5px;font-weight:bold;color:#04101f;border-radius:12px;padding:12px 26px;
+    background:linear-gradient(135deg,#ffe08a,#ffb347);
+    box-shadow:0 10px 24px rgba(255,179,71,.28);
+  }
+  .zyt_btn:active{transform:scale(.97)}
+  .zyt_btn.zyt_ghost{color:#cfe0ff;background:rgba(79,140,255,.14);border:1px solid rgba(79,140,255,.42);box-shadow:none}
+
+  /* zyt_fallback —— 周怡彤：降级面板 */
+  .zyt_fallback{margin-top:16px;background:rgba(255,138,138,.08);border:1px dashed rgba(255,138,138,.5);border-radius:14px;padding:16px 16px 4px}
+  .zyt_fallback p{font-size:13.5px;color:#ffc9c9;line-height:1.9}
+  .zyt_fallback .zyt_btn{margin:12px 0 12px}
+
+  /* zyt_notes —— 周怡彤：验收说明与降级说明 */
+  .zyt_notes{margin-top:18px;background:rgba(20,31,54,.9);border:1px solid var(--zyt_line);border-radius:16px;padding:16px 18px;font-size:13px;color:#b9c7e0;line-height:2}
+  .zyt_notes h2{font-size:14.5px;color:#fff;margin-bottom:6px}
+  .zyt_notes h2 + p{margin-bottom:10px}
+  .zyt_notes code{font-family:Consolas,monospace;font-size:12.5px;color:#8fd8ff;background:rgba(79,140,255,.14);border-radius:5px;padding:1px 6px}
+  .zyt_notes b{color:#fff}
+  .zyt_notes ul{padding-left:20px}
+  .zyt_notes li{margin-top:4px}
+
+  .zyt_hide{display:none!important}
+
+  .zyt_foot{margin-top:26px;text-align:center;font-size:12px;color:#4d5f80;line-height:2}
+  .zyt_foot a{color:#7fb0ff;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="zyt_shell">
+
+  <!-- zyt_head —— 周怡彤：第 4 关页头 -->
+  <header class="zyt_head">
+    <span class="zyt_badge">移动端触摸事件 · 4 关递进</span>
+    <h1 class="zyt_title">第 4 关 · <b>摇一摇彩蛋</b><br>传感器 · 权限 · 降级</h1>
+    <div class="zyt_meta">
+      <span>姓名：周怡彤</span>
+      <span>学号：24002120118</span>
+      <span>维度：设备能力 · 权限 · 降级</span>
+    </div>
+    <p class="zyt_lede">摇一摇手机，抽一道今日菜谱。一次摇动只触发一次；
+      没有传感器或没拿到权限时，页面会说明原因，并提供<b>“点我抽一次”</b>的按钮兜底。</p>
+  </header>
+
+  <!-- zyt_panel —— 周怡彤：摇一摇主面板 -->
+  <main class="zyt_panel">
+    <p class="zyt_panel-title">摇 一 摇 · 今 日 菜 谱</p>
+
+    <div class="zyt_draw-card" id="zyt_drawCard">
+      <p class="zyt_draw-label">今 日 菜 谱</p>
+      <h2 class="zyt_draw-name" id="zyt_drawName">摇一摇手机</h2>
+      <p class="zyt_draw-desc" id="zyt_drawDesc">连续摇动手机，看看今天吃什么</p>
+    </div>
+
+    <!-- 周怡彤：iOS 需要用户点击后才能申请运动传感器权限 -->
+    <button class="zyt_btn zyt_hide" id="zyt_sensorPermBtn" type="button">开启摇一摇</button>
+
+    <div class="zyt_sensor-info">
+      <p><span class="zyt_state-dot"></span><span id="zyt_sensorStatus">正在检测传感器…</span></p>
+      <p>合成加速度：<b id="zyt_sensorMag">--</b></p>
+    </div>
+
+    <!-- zyt_fallback —— 周怡彤：降级面板（默认隐藏） -->
+    <div class="zyt_fallback zyt_hide" id="zyt_sensorFallback">
+      <p id="zyt_fallbackMsg">当前设备不支持，请用手机打开</p>
+      <button class="zyt_btn" id="zyt_fallbackBtn" type="button">点我抽一次</button>
+    </div>
+  </main>
+
+  <!-- zyt_notes —— 周怡彤：验收说明 -->
+  <section class="zyt_notes">
+    <h2>验收四条</h2>
+    <ul>
+      <li>一次摇动只触发一次：超过阈值后进入 <b>1.5 秒冷却</b>，冷却期内的数据直接忽略。</li>
+      <li>无传感器设备：2.5 秒内收不到有效数据，显示“当前设备不支持，请用手机打开”，不报错、不白屏。</li>
+      <li>iOS 权限：`DeviceMotionEvent.requestPermission()` 必须由用户手势触发，所以用“开启摇一摇”按钮申请。</li>
+      <li>阈值 <b>18</b> 是按“含重力的合成加速度”定的：静止时约 9.8，明显摇动才会超过 18。</li>
+    </ul>
+
+    <h2>accelerationIncludingGravity 与 acceleration 的区别</h2>
+    <p><code>accelerationIncludingGravity</code> 含重力，静止时约为 9.8，兼容性好，几乎所有设备都有；
+      <code>acceleration</code> 是去掉重力后的纯运动加速度，静止时接近 0，但需要设备做重力融合，部分安卓机会返回 null。
+      因此这里用前者，并把阈值定在 18，而不是 2。</p>
+
+    <h2>为什么必须做降级</h2>
+    <p>传感器不是每台设备都有：台式机、部分平板、老手机没有加速度计；iOS 授权可能被拒绝；非 HTTPS 页面也可能拿不到事件。
+      如果只写摇一摇，没有传感器时页面就会一直停在“摇一摇手机”，用户会以为页面坏了。
+      降级的价值是：<b>设备不支持时把“不可用”明确说出来，并给一条能走通的路</b>——
+      用按钮完成同样的抽菜谱任务，保证核心功能在任何设备上都可用，而不是让页面静默失败。</p>
+  </section>
+
+  <a class="zyt_btn zyt_ghost" href="mobile-events.html" style="display:block;text-align:center;text-decoration:none;margin-top:18px;">← 回到第 1 关 · 事件侦探</a>
+
+  <footer class="zyt_foot">
+    周怡彤 · 24002120118 · 高级网页设计 2026-2027-1<br>
+    <a href="mobile-zoom.html">← 第 3 关</a>　<a href="index.html">课堂实践中心</a>
+  </footer>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+//  第 4 关 · 摇一摇彩蛋
+//  devicemotion → 合成加速度 → 阈值 18 → 1.5s 冷却 → 抽菜谱
+//  任何一步失败都要走降级，不能静默白屏
+// ══════════════════════════════════════════════════════════
+
+// 菜谱池（摇中后随机取一道，避免连续两次相同）
+var zyt_sensorDishes = [
+  { name: "宫保鸡丁", desc: "鸡丁、花生与干辣椒，酸甜麻辣，下饭首选。" },
+  { name: "麻婆豆腐", desc: "麻辣鲜香烫，一勺就能拌下一整碗米饭。" },
+  { name: "西湖醋鱼", desc: "酸甜鲜嫩，杭帮菜里最考验火候的一道。" },
+  { name: "北京烤鸭", desc: "皮酥肉嫩，卷饼配葱丝与甜面酱。" },
+  { name: "番茄牛腩", desc: "番茄熬到起沙，牛腩软烂，汤汁拌饭。" },
+  { name: "清蒸鲈鱼", desc: "只要葱姜和蒸鱼豉油，吃的就是鲜。" },
+  { name: "小炒黄牛肉", desc: "大火快炒，锅气足，配米饭刚刚好。" },
+  { name: "扬州炒饭", desc: "粒粒分明，火腿虾仁青豆一样不少。" }
+];
+
+// 阈值与冷却：含重力合成加速度静止约 9.8，超过 18 视为摇动；冷却 1.5 秒
+var zyt_sensorThreshold = 18;
+var zyt_sensorCooldown = 1500;
+
+// 运行状态
+var zyt_sensorStarted = false;        // 是否已经注册 devicemotion
+var zyt_sensorGotData = false;        // 是否收到过有效数据
+var zyt_sensorLastTrigger = 0;        // 上次触发时间（冷却用）
+var zyt_sensorFallbackTimer = null;   // “无数据”降级定时器
+var zyt_sensorLastIndex = -1;         // 上次抽中的菜谱下标
+
+// DOM 节点
+var zyt_drawCard = document.getElementById("zyt_drawCard");
+var zyt_drawName = document.getElementById("zyt_drawName");
+var zyt_drawDesc = document.getElementById("zyt_drawDesc");
+var zyt_sensorStatus = document.getElementById("zyt_sensorStatus");
+var zyt_sensorMag = document.getElementById("zyt_sensorMag");
+var zyt_sensorPermBtn = document.getElementById("zyt_sensorPermBtn");
+var zyt_sensorFallback = document.getElementById("zyt_sensorFallback");
+var zyt_fallbackMsg = document.getElementById("zyt_fallbackMsg");
+var zyt_fallbackBtn = document.getElementById("zyt_fallbackBtn");
+
+// 功能: 随机抽一道菜并渲染到结果卡上，同时播放一次弹出动画
+function zyt_drawDish() {
+  var zyt_index = Math.floor(Math.random() * zyt_sensorDishes.length);
+
+  // 避免连续两次抽到同一道菜
+  if (zyt_sensorDishes.length > 1 && zyt_index === zyt_sensorLastIndex) {
+    zyt_index = (zyt_index + 1) % zyt_sensorDishes.length;
+  }
+  zyt_sensorLastIndex = zyt_index;
+
+  var zyt_dish = zyt_sensorDishes[zyt_index];
+  zyt_drawName.textContent = zyt_dish.name;
+  zyt_drawDesc.textContent = zyt_dish.desc;
+
+  // 先移除再强制回流，保证连续的抽取都能重新播放动画
+  zyt_drawCard.classList.remove("zyt_pop");
+  void zyt_drawCard.offsetWidth;
+  zyt_drawCard.classList.add("zyt_pop");
+}
+
+// 功能: 显示降级面板并写明原因，同时更新状态行
+function zyt_sensorShowFallback(zyt_reason) {
+  zyt_sensorFallback.classList.remove("zyt_hide");
+  zyt_fallbackMsg.textContent = zyt_reason;
+  zyt_sensorStatus.textContent = zyt_reason;
+}
+
+// 功能: 处理 devicemotion 数据——计算合成加速度，超过阈值且冷却结束才触发
+function zyt_sensorOnMotion(e) {
+  var zyt_acc = e.accelerationIncludingGravity;
+
+  // 有些桌面浏览器会派发事件但数值全为 null，视作“没有传感器”
+  if (!zyt_acc || zyt_acc.x === null || zyt_acc.y === null || zyt_acc.z === null) {
+    if (!zyt_sensorGotData) {
+      zyt_sensorShowFallback("当前设备不支持，请用手机打开");
+    }
+    return;
+  }
+
+  // 第一次拿到有效数据：标记可用，撤掉“无数据”降级定时器
+  if (!zyt_sensorGotData) {
+    zyt_sensorGotData = true;
+    if (zyt_sensorFallbackTimer) {
+      clearTimeout(zyt_sensorFallbackTimer);
+      zyt_sensorFallbackTimer = null;
+    }
+    zyt_sensorFallback.classList.add("zyt_hide");
+    zyt_sensorStatus.textContent = "传感器已就绪，摇一摇试试";
+  }
+
+  // 合成加速度：√(x² + y² + z²)，静止时约 9.8
+  var zyt_mag = Math.sqrt(
+    zyt_acc.x * zyt_acc.x +
+    zyt_acc.y * zyt_acc.y +
+    zyt_acc.z * zyt_acc.z
+  );
+  zyt_sensorMag.textContent = zyt_mag.toFixed(1);
+
+  var zyt_now = Date.now();
+
+  // 阈值判断 + 1.5 秒冷却：一次摇动只触发一次
+  if (zyt_mag > zyt_sensorThreshold && zyt_now - zyt_sensorLastTrigger > zyt_sensorCooldown) {
+    zyt_sensorLastTrigger = zyt_now;
+    zyt_drawDish();
+    zyt_sensorStatus.textContent = "检测到摇动 · 已抽取";
+  }
+}
+
+// 功能: 注册 devicemotion 监听；2.5 秒内没有有效数据就进入降级
+function zyt_sensorStart() {
+  if (zyt_sensorStarted) return;
+
+  if (typeof DeviceMotionEvent === "undefined") {
+    zyt_sensorShowFallback("当前设备不支持，请用手机打开");
+    return;
+  }
+
+  zyt_sensorStarted = true;
+  zyt_sensorLastTrigger = Date.now();   // 避免打开页面时的轻微晃动立即触发
+  window.addEventListener("devicemotion", zyt_sensorOnMotion);
+  zyt_sensorStatus.textContent = "正在等待摇动…";
+
+  zyt_sensorFallbackTimer = setTimeout(function () {
+    if (!zyt_sensorGotData) {
+      zyt_sensorShowFallback("当前设备不支持，请用手机打开");
+    }
+  }, 2500);
+}
+
+// 功能: iOS 授权流程——必须在用户点击事件里调用 requestPermission
+function zyt_sensorRequestPermission() {
+  zyt_sensorPermBtn.classList.add("zyt_hide");
+
+  DeviceMotionEvent.requestPermission().then(function (zyt_state) {
+    if (zyt_state === "granted") {
+      zyt_sensorStart();
+    } else {
+      zyt_sensorShowFallback("未获得运动传感器权限，请用手机打开或点我抽一次");
+    }
+  }).catch(function () {
+    // 用户取消或浏览器不支持，同样走降级，不能让页面无响应
+    zyt_sensorShowFallback("权限申请失败，请用手机打开或点我抽一次");
+  });
+}
+
+// 功能: 页面初始化——判断是否需要 iOS 授权，否则直接开始监听
+function zyt_sensorInit() {
+  if (typeof DeviceMotionEvent !== "undefined" &&
+      typeof DeviceMotionEvent.requestPermission === "function") {
+    // iOS 13+：必须由按钮点击触发授权
+    zyt_sensorStatus.textContent = "iOS 需要先授权运动传感器";
+    zyt_sensorPermBtn.classList.remove("zyt_hide");
+    zyt_sensorPermBtn.addEventListener("click", zyt_sensorRequestPermission);
+    return;
+  }
+
+  // 安卓 / 其他浏览器：直接监听，拿不到数据再降级
+  zyt_sensorStart();
+}
+
+// 降级按钮：无论有没有传感器，都能用点击完成“抽菜谱”
+zyt_fallbackBtn.addEventListener("click", function () {
+  zyt_drawDish();
+  zyt_sensorStatus.textContent = "已使用按钮抽取（降级方案）";
+});
+
+// 启动
+zyt_sensorInit();
+</script>
+</body>
+</html>

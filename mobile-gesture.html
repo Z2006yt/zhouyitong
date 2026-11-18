@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<!--
+  作者: 周怡彤
+  学号: 24002120118
+  建立时间: 2026-11-18
+  使用大模型: DeepSeek-V4.1-Flash
+  功能名称: 移动端触摸事件课堂实践 · 第 2 关 手势卡片（左右滑动切换中华美食，40px 阈值 + 300ms 冷却 + 边界提示）
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 2 关 · 手势卡片 · 移动端触摸事件 4 关递进（周怡彤）</title>
+<style>
+  /* zyt_reset —— 周怡彤：基础重置 + 去掉移动端点击灰块 */
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  :root{
+    --zyt_bg:#080d1a;
+    --zyt_card:#111a2e;
+    --zyt_line:rgba(120,160,240,.18);
+    --zyt_txt:#e8eefb;
+    --zyt_sub:#93a4c4;
+    --zyt_blue:#4f8cff;
+    --zyt_cyan:#35d6c4;
+    --zyt_orange:#ffb347;
+  }
+  body{
+    font-family:"PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+    color:var(--zyt_txt);min-height:100vh;line-height:1.7;
+    background:
+      radial-gradient(900px 420px at 50% -8%,rgba(79,140,255,.30),transparent 70%),
+      radial-gradient(700px 380px at 105% 12%,rgba(255,179,71,.12),transparent 70%),
+      var(--zyt_bg);
+  }
+  /* zyt_shell —— 周怡彤：移动端单列容器 */
+  .zyt_shell{max-width:600px;margin:0 auto;padding:22px 16px 46px}
+
+  /* zyt_head —— 周怡彤：页头与身份信息 */
+  .zyt_head{margin-bottom:18px}
+  .zyt_badge{display:inline-block;font-size:12px;letter-spacing:2px;color:#bcd4ff;background:rgba(79,140,255,.16);border:1px solid rgba(79,140,255,.38);border-radius:999px;padding:4px 12px;margin-bottom:12px}
+  .zyt_title{font-size:25px;line-height:1.35;letter-spacing:.5px}
+  .zyt_title b{color:var(--zyt_orange)}
+  .zyt_meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .zyt_meta span{font-size:12.5px;color:#c6d4f2;background:rgba(255,255,255,.05);border:1px solid var(--zyt_line);border-radius:8px;padding:4px 10px}
+  .zyt_lede{margin-top:14px;font-size:14px;color:var(--zyt_sub)}
+  .zyt_lede b{color:#dce7ff}
+
+  /* zyt_board —— 周怡彤：卡片舞台（只在这里接管横向手势，纵向仍交给浏览器） */
+  .zyt_board{
+    position:relative;margin-top:18px;
+    touch-action:pan-y;                 /* 只接管横向，纵向仍可滚动页面 */
+    user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;
+  }
+  .zyt_dish{
+    position:relative;overflow:hidden;border-radius:22px;height:360px;
+    padding:24px 22px;display:flex;flex-direction:column;justify-content:flex-end;
+    background:linear-gradient(160deg,#8e2d1f,#d9542b);
+    box-shadow:0 22px 46px rgba(0,0,0,.42),inset 0 0 0 1px rgba(255,255,255,.14);
+    transition:transform .3s ease,opacity .3s ease;
+    will-change:transform,opacity;
+  }
+  /* 进场起点：右侧滑入 / 左侧滑入；transition:none 保证瞬间归位后再做 0.3s 过渡 */
+  .zyt_dish.zyt_enter-right{transition:none;transform:translateX(52px) rotate(1.6deg);opacity:0}
+  .zyt_dish.zyt_enter-left{transition:none;transform:translateX(-52px) rotate(-1.6deg);opacity:0}
+
+  /* zyt_dish-no —— 周怡彤：大号序号水印 */
+  .zyt_dish-no{position:absolute;top:6px;right:18px;font-size:96px;font-weight:800;line-height:1;color:rgba(255,255,255,.16);letter-spacing:-4px}
+  /* zyt_dish-cuisine —— 周怡彤：菜系标签 */
+  .zyt_dish-cuisine{align-self:flex-start;font-size:12px;letter-spacing:2px;color:#fff;background:rgba(0,0,0,.26);border:1px solid rgba(255,255,255,.34);border-radius:999px;padding:4px 12px;margin-bottom:auto}
+  .zyt_dish-name{font-size:30px;line-height:1.25;letter-spacing:1px;text-shadow:0 2px 16px rgba(0,0,0,.35)}
+  .zyt_dish-flavor{font-size:13px;color:rgba(255,255,255,.86);margin-top:4px;letter-spacing:1px}
+  .zyt_dish-desc{font-size:14px;color:rgba(255,255,255,.9);line-height:1.85;margin-top:10px}
+  .zyt_dish-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .zyt_dish-tags span{font-size:12px;color:#fff;background:rgba(0,0,0,.26);border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:3px 11px}
+
+  /* zyt_status —— 周怡彤：第几张 + 提示条 */
+  .zyt_status{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px}
+  .zyt_count{font-size:14px;color:var(--zyt_sub)}
+  .zyt_count b{font-size:20px;color:#fff;font-family:Consolas,monospace}
+  .zyt_dots{display:flex;gap:6px}
+  .zyt_dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.22);transition:background .25s,width .25s}
+  .zyt_dot.zyt_dot-on{width:22px;border-radius:5px;background:var(--zyt_orange)}
+
+  /* zyt_tip —— 周怡彤：操作 / 边界提示 */
+  .zyt_tip{margin-top:12px;min-height:26px;font-size:13px;color:#9fb8e6;text-align:center;letter-spacing:.5px}
+  .zyt_tip.zyt_warn{color:#ff8a8a}
+
+  /* zyt_notes —— 周怡彤：实现要点说明 */
+  .zyt_notes{margin-top:20px;background:rgba(20,31,54,.9);border:1px solid var(--zyt_line);border-radius:16px;padding:16px 18px;font-size:13px;color:#b9c7e0;line-height:2}
+  .zyt_notes h2{font-size:14.5px;color:#fff;margin-bottom:6px}
+  .zyt_notes code{font-family:Consolas,monospace;font-size:12.5px;color:#8fd8ff;background:rgba(79,140,255,.14);border-radius:5px;padding:1px 6px}
+  .zyt_notes b{color:#fff}
+
+  .zyt_foot{margin-top:26px;text-align:center;font-size:12px;color:#4d5f80;line-height:2}
+  .zyt_foot a{color:#7fb0ff;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="zyt_shell">
+
+  <!-- zyt_head —— 周怡彤：第 2 关页头 -->
+  <header class="zyt_head">
+    <span class="zyt_badge">移动端触摸事件 · 4 关递进</span>
+    <h1 class="zyt_title">第 2 关 · <b>手势卡片</b><br>左右滑动切换中华美食</h1>
+    <div class="zyt_meta">
+      <span>姓名：周怡彤</span>
+      <span>学号：24002120118</span>
+      <span>维度：手势识别 · DOM 操作</span>
+    </div>
+    <p class="zyt_lede">在卡片上<b>左滑看下一道、右滑看上一道</b>。短距离抖动不算滑动；连续快滑也只会走一张；
+      纵向拖动时页面照常滚动，不会被卡片“锁死”。</p>
+  </header>
+
+  <!-- zyt_board —— 周怡彤：触摸舞台 -->
+  <main class="zyt_board" id="zyt_gestureBoard">
+    <article class="zyt_dish" id="zyt_gestureCard">
+      <div class="zyt_dish-no" id="zyt_dishNo">01</div>
+      <span class="zyt_dish-cuisine" id="zyt_dishCuisine">川菜</span>
+      <h2 class="zyt_dish-name" id="zyt_dishName">宫保鸡丁</h2>
+      <p class="zyt_dish-flavor" id="zyt_dishFlavor">糊辣荔枝味 · 酸甜麻辣</p>
+      <p class="zyt_dish-desc" id="zyt_dishDesc">鸡丁、花生与干辣椒在锅里相遇，酸甜麻辣一层层铺开，是最容易被记住的川味。</p>
+      <div class="zyt_dish-tags" id="zyt_dishTags">
+        <span>鸡腿肉</span><span>花生米</span><span>干辣椒</span>
+      </div>
+    </article>
+  </main>
+
+  <div class="zyt_status">
+    <p class="zyt_count">第 <b id="zyt_gestureNow">1</b>/4 张</p>
+    <div class="zyt_dots" id="zyt_gestureDots">
+      <i class="zyt_dot zyt_dot-on"></i><i class="zyt_dot"></i><i class="zyt_dot"></i><i class="zyt_dot"></i>
+    </div>
+  </div>
+
+  <p class="zyt_tip" id="zyt_gestureTip">左滑下一道 · 右滑上一道</p>
+
+  <!-- zyt_notes —— 周怡彤：实现要点 -->
+  <section class="zyt_notes">
+    <h2>这关的关键实现</h2>
+    <p>· 监听 <code>touchstart</code> 记起点，<code>touchend</code> 用 <b>changedTouches[0]</b> 算横向位移（抬手时 touches 里已经没有这根手指）。</p>
+    <p>· 阈值 <b>40px</b>：小于阈值视为误触，不切换；并且要求横向位移大于纵向位移，避免斜着划也被当成翻页。</p>
+    <p>· <b>300ms 冷却</b>：快速连滑时，前一次切换还没结束就忽略后续手势，防止一次跳两张。</p>
+    <p>· 卡片容器只加 <code>touch-action: pan-y</code>：横向归脚本，纵向仍交给浏览器滚动页面。</p>
+    <p>· 切换时加 <code>.zyt_enter-left / .zyt_enter-right</code> 起始类，再移除，形成 0.3s 进场过渡。</p>
+  </section>
+
+  <a class="zyt_skip" href="mobile-zoom.html" style="display:block;margin-top:18px;text-align:center;text-decoration:none;color:#04101f;font-weight:bold;font-size:14px;background:linear-gradient(135deg,#35d6c4,#4f8cff);border-radius:12px;padding:13px 18px;">进入第 3 关 · 图片查看器 ›</a>
+
+  <footer class="zyt_foot">
+    周怡彤 · 24002120118 · 高级网页设计 2026-2027-1<br>
+    <a href="mobile-events.html">← 返回第 1 关</a>　<a href="index.html">课堂实践中心</a>
+  </footer>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+//  第 2 关 · 手势卡片：touchstart 记起点 → touchend 算位移 → 阈值判断
+// ══════════════════════════════════════════════════════════
+
+// 4 道菜的数据（菜名、菜系、口味、简介、标签、渐变背景）
+var zyt_gestureDishes = [
+  {
+    no: "01", cuisine: "川菜", name: "宫保鸡丁", flavor: "糊辣荔枝味 · 酸甜麻辣",
+    desc: "鸡丁、花生与干辣椒在锅里相遇，酸甜麻辣一层层铺开，是最容易被记住的川味。",
+    tags: ["鸡腿肉", "花生米", "干辣椒"],
+    bg: "linear-gradient(160deg,#8e2d1f,#d9542b)"
+  },
+  {
+    no: "02", cuisine: "川菜", name: "麻婆豆腐", flavor: "麻、辣、烫、香、酥、嫩",
+    desc: "一勺豆瓣酱、一撮花椒面，让最朴素的豆腐有了“麻辣鲜香烫”的六重性格。",
+    tags: ["嫩豆腐", "牛肉末", "花椒面"],
+    bg: "linear-gradient(160deg,#7c1f1a,#c2410c)"
+  },
+  {
+    no: "03", cuisine: "浙菜", name: "西湖醋鱼", flavor: "酸甜鲜嫩 · 蟹味隐约",
+    desc: "草鱼汆熟后浇上糖醋汁，酸甜里透出一点蟹味，是杭帮菜里最考验火候的一道。",
+    tags: ["草鱼", "糖醋汁", "姜末"],
+    bg: "linear-gradient(160deg,#0f4c5c,#2a9d8f)"
+  },
+  {
+    no: "04", cuisine: "京菜", name: "北京烤鸭", flavor: "皮酥肉嫩 · 果木清香",
+    desc: "果木明火烤出的脆皮，片成薄片卷进荷叶饼，配葱丝与甜面酱，一口就是老北京。",
+    tags: ["填鸭", "荷叶饼", "甜面酱"],
+    bg: "linear-gradient(160deg,#6b3a12,#d99a3a)"
+  }
+];
+
+// 当前显示到第几张（0 开始）
+var zyt_gestureIndex = 0;
+
+// 触摸起点、上次切换时间（用于 300ms 冷却）、提示定时器
+var zyt_gestureStartX = 0;
+var zyt_gestureStartY = 0;
+var zyt_gestureLastSwitch = 0;
+var zyt_gestureTipTimer = null;
+
+// 常用 DOM 节点
+var zyt_gestureBoard = document.getElementById("zyt_gestureBoard");
+var zyt_gestureCard = document.getElementById("zyt_gestureCard");
+var zyt_gestureNow = document.getElementById("zyt_gestureNow");
+var zyt_gestureDots = document.getElementById("zyt_gestureDots");
+var zyt_gestureTip = document.getElementById("zyt_gestureTip");
+var zyt_dishNo = document.getElementById("zyt_dishNo");
+var zyt_dishCuisine = document.getElementById("zyt_dishCuisine");
+var zyt_dishName = document.getElementById("zyt_dishName");
+var zyt_dishFlavor = document.getElementById("zyt_dishFlavor");
+var zyt_dishDesc = document.getElementById("zyt_dishDesc");
+var zyt_dishTags = document.getElementById("zyt_dishTags");
+
+// 功能: 把当前索引对应的菜品数据渲染到卡片上，并同步圆点与“第 x/4 张”
+function zyt_renderDish() {
+  var zyt_dish = zyt_gestureDishes[zyt_gestureIndex];
+
+  zyt_dishNo.textContent = zyt_dish.no;
+  zyt_dishCuisine.textContent = zyt_dish.cuisine;
+  zyt_dishName.textContent = zyt_dish.name;
+  zyt_dishFlavor.textContent = zyt_dish.flavor;
+  zyt_dishDesc.textContent = zyt_dish.desc;
+  zyt_gestureCard.style.background = zyt_dish.bg;
+
+  // 标签重新生成，避免残留上一道菜的关键词
+  zyt_dishTags.innerHTML = "";
+  zyt_dish.tags.forEach(function (zyt_tag) {
+    var zyt_span = document.createElement("span");
+    zyt_span.textContent = zyt_tag;
+    zyt_dishTags.appendChild(zyt_span);
+  });
+
+  // 计数与圆点
+  zyt_gestureNow.textContent = zyt_gestureIndex + 1;
+  Array.prototype.forEach.call(zyt_gestureDots.children, function (zyt_dot, zyt_i) {
+    zyt_dot.classList.toggle("zyt_dot-on", zyt_i === zyt_gestureIndex);
+  });
+}
+
+// 功能: 让卡片从指定方向滑入（先加起始类，强制回流后再移除，触发 0.3s 过渡）
+function zyt_animateCardIn(zyt_direction) {
+  var zyt_class = zyt_direction === "next" ? "zyt_enter-right" : "zyt_enter-left";
+  zyt_gestureCard.classList.add(zyt_class);
+
+  // 读取一次布局属性，强制浏览器先应用起始位置，否则会被合并成一帧、看不到动画
+  void zyt_gestureCard.offsetWidth;
+
+  zyt_gestureCard.classList.remove(zyt_class);
+}
+
+// 功能: 在提示条显示一句话（边界提示用红色，1.6 秒后恢复默认文案）
+function zyt_showGestureTip(zyt_msg, zyt_warn) {
+  if (zyt_gestureTipTimer) clearTimeout(zyt_gestureTipTimer);
+
+  zyt_gestureTip.textContent = zyt_msg;
+  zyt_gestureTip.classList.toggle("zyt_warn", !!zyt_warn);
+
+  zyt_gestureTipTimer = setTimeout(function () {
+    zyt_gestureTip.textContent = "左滑下一道 · 右滑上一道";
+    zyt_gestureTip.classList.remove("zyt_warn");
+  }, 1600);
+}
+
+// 功能: 根据方向切换卡片（带边界判断与 300ms 冷却，防止一次手势跳两张）
+function zyt_switchDish(zyt_step, zyt_direction) {
+  var zyt_now = Date.now();
+
+  // 冷却：两次切换至少间隔 300ms，快速连滑时后面的手势直接丢弃
+  if (zyt_now - zyt_gestureLastSwitch < 300) return;
+
+  var zyt_next = zyt_gestureIndex + zyt_step;
+
+  // 边界：第一张再往前、最后一张再往后，只提示不切换
+  if (zyt_next < 0) {
+    zyt_gestureLastSwitch = zyt_now;
+    zyt_showGestureTip("已经是第一张了", true);
+    return;
+  }
+  if (zyt_next >= zyt_gestureDishes.length) {
+    zyt_gestureLastSwitch = zyt_now;
+    zyt_showGestureTip("已经是最后一张了", true);
+    return;
+  }
+
+  zyt_gestureLastSwitch = zyt_now;
+  zyt_gestureIndex = zyt_next;
+  zyt_renderDish();
+  zyt_animateCardIn(zyt_direction);
+  zyt_showGestureTip("已切换到第 " + (zyt_gestureIndex + 1) + " 张", false);
+}
+
+// 功能: 手指按下时记录起点坐标，作为滑动位移的计算基准
+zyt_gestureBoard.addEventListener("touchstart", function (e) {
+  var zyt_t = e.touches[0];
+  zyt_gestureStartX = zyt_t.clientX;
+  zyt_gestureStartY = zyt_t.clientY;
+}, { passive: true });
+
+// 功能: 手指抬起时用 changedTouches[0] 计算位移，超过 40px 且横向占优才翻页
+zyt_gestureBoard.addEventListener("touchend", function (e) {
+  var zyt_t = e.changedTouches[0];          // 抬手时 touches 里已没有这根手指
+  var zyt_dx = zyt_t.clientX - zyt_gestureStartX;
+  var zyt_dy = zyt_t.clientY - zyt_gestureStartY;
+
+  // 阈值 40px：太小会把手指抖动误判成滑动
+  if (Math.abs(zyt_dx) < 40) return;
+
+  // 横向必须明显大于纵向，避免斜着划或纵向滚动时误翻页
+  if (Math.abs(zyt_dx) <= Math.abs(zyt_dy)) return;
+
+  if (zyt_dx < 0) {
+    zyt_switchDish(1, "next");              // 向左滑 → 下一道
+  } else {
+    zyt_switchDish(-1, "prev");             // 向右滑 → 上一道
+  }
+}, { passive: true });
+
+// 功能: 触摸被系统打断时复位提示，避免界面停留在警告状态
+zyt_gestureBoard.addEventListener("touchcancel", function () {
+  if (zyt_gestureTipTimer) {
+    clearTimeout(zyt_gestureTipTimer);
+    zyt_gestureTipTimer = null;
+  }
+  zyt_gestureTip.textContent = "左滑下一道 · 右滑上一道";
+  zyt_gestureTip.classList.remove("zyt_warn");
+}, { passive: true });
+
+// 首屏渲染一次，保证计数、圆点与初始数据一致
+zyt_renderDish();
+</script>
+</body>
+</html>
